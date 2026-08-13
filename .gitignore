@@ -1,0 +1,18 @@
+# Flutter
+flutter/.dart_tool/
+flutter/build/
+flutter/pubspec.lock
+flutter/example/.dart_tool/
+flutter/example/build/
+flutter/example/pubspec.lock
+flutter/example/*.iml
+
+# Python
+PyQT/__pycache__/
+PyQT/**/__pycache__/
+*.pyc
+PyQT/.pytest_cache/
+PyQT/.venv/
+PyQT/dist/
+PyQT/build/
+PyQT/*.egg-info/

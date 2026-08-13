@@ -1,0 +1,6 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Una librería expone tipos públicos: documentarlos no es opcional.
+    public_member_api_docs: true

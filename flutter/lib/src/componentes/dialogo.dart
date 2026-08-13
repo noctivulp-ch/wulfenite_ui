@@ -1,0 +1,248 @@
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
+import '../tokens/tema.dart';
+
+/// Por debajo de este alto la pantalla se considera acostada.
+///
+/// Es alto y no orientación a propósito: lo que escasea acostado es el alto, y
+/// una tablet apaisada de 800 dp no tiene el problema que sí tiene un teléfono
+/// de 360.
+const double wulfAltoAcostado = 520;
+
+/// Si la ventana está acostada: poco alto y ancho de sobra.
+///
+/// Se mide por ALTO y no por orientación a propósito — lo que escasea acostado
+/// es el alto, y una tablet apaisada no tiene el problema de un teléfono.
+bool wulfEstaAcostado(BuildContext context) => MediaQuery.sizeOf(context).height < wulfAltoAcostado;
+
+/// El diálogo de la app: mismo cuerpo en las dos orientaciones, con las acciones
+/// DEBAJO de pie y AL COSTADO acostado.
+///
+/// Acostado el alto es el recurso escaso —los campos ya se lo comen— así que las
+/// acciones se van a donde sobra espacio. Dejarlas en `actions` las manda debajo,
+/// que es exactamente lo que no entra: el formulario de producto desbordaba 95 px
+/// por eso.
+class WulfDialogo extends StatelessWidget {
+  /// Un diálogo con [titulo], [contenido] y [acciones].
+  const WulfDialogo({
+    super.key,
+    required this.titulo,
+    required this.contenido,
+    required this.acciones,
+    this.anchoAcostado = 560,
+  });
+
+  /// El encabezado.
+  final Widget titulo;
+
+  /// El cuerpo. Se desplaza solo si no entra, así que puede ser largo.
+  final Widget contenido;
+
+  /// Los botones. Ver [WulfAcciones] para dónde va cada uno y por qué.
+  final WulfAcciones acciones;
+
+  /// Cuánto ancho toma el diálogo acostado. Sin acotarlo, el contenido y la
+  /// columna de acciones se reparten el ancho de la pantalla entera.
+  final double anchoAcostado;
+
+  @override
+  Widget build(BuildContext context) {
+    final acostado = wulfEstaAcostado(context);
+
+    // El scroll lo pone ESTE widget dentro del contenido, en vez de usar
+    // `AlertDialog(scrollable: true)`.
+    //
+    // `scrollable` envuelve todo en un `IntrinsicWidth`, y un `GridView`
+    // —aunque sea `shrinkWrap`— no sabe dar dimensiones intrínsecas:
+    // "RenderShrinkWrappingViewport does not support returning intrinsic
+    // dimensions", y el diálogo sale VACÍO. Pasó en el aparato con el
+    // calendario y con las cuadrículas de mes y de año: no se veía nada, solo
+    // el velo.
+    //
+    // Con el scroll acá dentro se consigue lo mismo que se buscaba —que el
+    // contenido ceda cuando el teclado se come el alto, en vez de que el
+    // diálogo se parta— sin medir nada intrínseco.
+    return AlertDialog(
+      title: titulo,
+      content: acostado
+          ? ConstrainedBox(
+              // `maxWidth` y no un ancho fijo: acostado la pantalla siempre da
+              // más de 560, pero fijarlo obligaría al diálogo a ese ancho aun
+              // cuando la ventana sea menor.
+              constraints: BoxConstraints(maxWidth: anchoAcostado),
+              // El scroll envuelve la FILA entera, contenido y acciones juntos.
+              // Envolviendo solo el contenido, con el teclado abierto la
+              // columna de acciones seguía pidiendo su alto y desbordaba: lo
+              // que tiene que ceder acostado es el bloque completo.
+              child: SingleChildScrollView(
+                child: Row(
+                  // `start` y no `stretch`: dentro de un scroll el alto es
+                  // ilimitado, y estirar a un infinito no significa nada.
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: contenido),
+                    const SizedBox(width: WulfSpacing.pared),
+                    // `IntrinsicWidth`: la cuadrícula de acciones necesita un
+                    // ancho acotado para repartir sus dos columnas dentro de
+                    // una fila.
+                    IntrinsicWidth(child: acciones),
+                  ],
+                ),
+              ),
+            )
+          : SingleChildScrollView(child: contenido),
+      actions: acostado ? null : [acciones],
+    );
+  }
+}
+
+/// Las acciones de un diálogo en dos columnas, fila por fila.
+///
+/// Dos columnas y no una `Row` con todos los botones: en 360 dp cuatro no
+/// entran de ancho, y cuando no entran `AlertDialog` los apila alineados a la
+/// derecha, perdiendo de qué habla cada uno.
+///
+/// **La acción que confirma va a la DERECHA y Cancelar a su izquierda, en la
+/// misma fila.** No es una preferencia estética: lo pidió el dueño porque para
+/// guardar se pulsa a la derecha sin mirar. Estaba al revés en toda la app —la
+/// acción a la izquierda y Cancelar a la derecha— y en el diálogo de crear una
+/// categoría al vuelo eso significa pulsar Cancelar creyendo guardar.
+///
+/// Las acciones **sobre el objeto** (reactivar, eliminar, cámara, galería) van en
+/// las filas siguientes de la columna izquierda: quedan lejos del sitio al que va
+/// el pulgar a confirmar, que es justo donde no se quiere un borrado.
+///
+/// Un diálogo cuya única acción es salir deja ese botón a la derecha: ahí no hay
+/// nada que confirmar, así que no hay confusión posible y es donde llega el dedo.
+///
+/// Hay una prueba que lo vigila diálogo por diálogo —`test/orden_acciones_test`—
+/// porque es una convención que se rompe sola: al agregar un botón, lo natural es
+/// ponerlo donde quepa.
+class WulfAcciones extends StatelessWidget {
+  /// Coloca los botones en dos columnas.
+  ///
+  /// La acción que **confirma** va en [derecha] y cancelar en [izquierda], en la
+  /// misma fila: para guardar se pulsa a la derecha sin mirar. Lo que actúa
+  /// sobre el objeto —reactivar, eliminar— va en las filas siguientes de
+  /// [izquierda], lejos de donde llega el pulgar a confirmar.
+  const WulfAcciones({super.key, this.izquierda = const [], required this.derecha});
+
+  /// Columna izquierda. Puede estar vacía.
+  final List<Widget> izquierda;
+
+  /// Columna derecha. Siempre lleva la salida del diálogo.
+  final List<Widget> derecha;
+
+  @override
+  Widget build(BuildContext context) {
+    final filas = math.max(izquierda.length, derecha.length);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < filas; i++)
+          Padding(
+            // Aire entre filas: pegados, los botones se leen como un bloque y
+            // cuesta ver cuál es cuál.
+            padding: EdgeInsets.only(
+              top: i == 0 ? 0 : WulfSpacing.unidad,
+              bottom: WulfSpacing.unidad / 2,
+            ),
+            child: Row(
+              children: [
+                // Dos columnas del MISMO ancho, no dos botones repartidos con
+                // `spaceBetween`: así cada uno se colocaba según su propio largo
+                // y las columnas quedaban descuadradas entre filas.
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: i < izquierda.length ? izquierda[i] : const SizedBox.shrink(),
+                  ),
+                ),
+                const SizedBox(width: WulfSpacing.gapCelda),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: i < derecha.length ? derecha[i] : const SizedBox.shrink(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Un paso de un panel inline de Configuración: título, algo de contenido y sus
+/// acciones.
+///
+/// Misma regla que [WulfDialogo] y por el mismo motivo, pero para lo que NO es
+/// un diálogo: los paneles de Configuración —catálogo, backup, restaurar,
+/// contraseña— apilaban sus botones debajo del texto, y acostado eso es lo que
+/// no entra. Acá van al costado.
+///
+/// La columna de acciones se lleva 2 de 5 partes en vez de medir su contenido:
+/// estos botones llevan frases enteras ("Reemplazar — descontinúa lo que no
+/// venga en el archivo") y un `IntrinsicWidth` les habría dado media pantalla.
+class WulfPanel extends StatelessWidget {
+  /// Un panel con el mismo reparto de acciones que un diálogo, pero embebido
+  /// en la pantalla en vez de flotando encima.
+  const WulfPanel({super.key, required this.titulo, this.contenido, required this.acciones});
+
+  /// El encabezado del panel.
+  final String titulo;
+
+  /// Explicación, campos, lo que el paso necesite. Puede no haber.
+  final Widget? contenido;
+
+  /// En el orden en que se leen. Acostado quedan en columna al costado; de pie,
+  /// apilados debajo, que es como estaban.
+  final List<Widget> acciones;
+
+  @override
+  Widget build(BuildContext context) {
+    final cuerpo = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(titulo, style: Theme.of(context).textTheme.titleMedium),
+        if (contenido != null) ...[const SizedBox(height: WulfSpacing.gapCelda), contenido!],
+      ],
+    );
+
+    final botones = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var i = 0; i < acciones.length; i++) ...[
+          if (i > 0) const SizedBox(height: WulfSpacing.unidad),
+          acciones[i],
+        ],
+      ],
+    );
+
+    if (!wulfEstaAcostado(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          cuerpo,
+          const SizedBox(height: WulfSpacing.gapCelda),
+          botones,
+        ],
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(flex: 3, child: cuerpo),
+        const SizedBox(width: WulfSpacing.pared),
+        Expanded(flex: 2, child: botones),
+      ],
+    );
+  }
+}
