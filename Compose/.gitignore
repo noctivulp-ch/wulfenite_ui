@@ -1,0 +1,7 @@
+# Apunta al SDK de esta máquina concreta.
+local.properties
+.gradle/
+build/
+.idea/
+*.iml
+.kotlin/

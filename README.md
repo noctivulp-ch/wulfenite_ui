@@ -1,6 +1,6 @@
 # Wulfenite-UI
 
-Un sistema de diseño, dos librerías gemelas: **superficies lacadas con canto
+Un sistema de diseño, tres librerías gemelas: **superficies lacadas con canto
 metálico**, retícula de seis columnas, y componentes que llevan sus reglas
 dentro.
 
@@ -12,27 +12,35 @@ canto de un píxel que es lo único que carga la profundidad.
 wulfenite_ui/
 ├── doc/reglas.md   ← las once reglas. Lo único que de verdad define el sistema
 ├── flutter/        ← paquete Dart · wulf_flutter
-└── PyQT/           ← paquete Python · wulf_qt
+├── PyQT/           ← paquete Python · wulf_qt
+└── Compose/        ← paquete Kotlin · wulf-compose (Android nativo)
 ```
 
-## Las dos son la misma cosa
+## Las tres son la misma cosa
 
-| | Flutter | PyQT |
-|---|---|---|
-| Paquete | `wulf_flutter` | `wulf_qt` |
-| Cómo se aplica | `buildWulfTheme(WulfAcento.oro)` | `aplicar(app, Acento.ORO, Modo.OSCURO)` |
-| Pruebas | 69 | 44 |
-| Ejemplo | `example/` — banco de estilo | `ejemplo/banco.py` — banco de estilo |
+| | Flutter | PyQT | Compose |
+|---|---|---|---|
+| Paquete | `wulf_flutter` | `wulf_qt` | `wulf-compose` |
+| Cómo se aplica | `buildWulfTheme(WulfAcento.oro)` | `aplicar(app, Acento.ORO, Modo.OSCURO)` | `WulfTheme(WulfAcento.ORO) { }` |
+| Pruebas | 69 | 44 | 34 |
+| Ejemplo | `example/` | `ejemplo/banco.py` | `ejemplo/` |
 
-Comparten prefijo de paquete (`wulf_`) para que convivan sin chocar, y comparten
+Comparten prefijo de paquete (`wulf`) para que convivan sin chocar, y comparten
 **los valores exactos**: los mismos hexadecimales, el mismo espaciado, los mismos
 radios.
 
-Eso no se sostiene con disciplina. `PyQT/tests/test_paridad_con_dart.py` lee el
-archivo Dart y falla si alguno se separa. Dos copias de una paleta es la manera
+Eso no se sostiene con disciplina. Cada port lee el archivo Dart y falla si algún
+valor se separa —`PyQT/tests/test_paridad_con_dart.py` y
+`Compose/.../ParidadConDartTest.kt`—. Tres copias de una paleta es la manera
 clásica de que un sistema de diseño se rompa: alguien ajusta un color de un lado,
-el otro se queda viejo, y meses después las dos apps de la misma marca ya no se
+los otros se quedan viejos, y meses después las apps de la misma marca ya no se
 parecen.
+
+Y no es hipotético: la paridad ya cazó **dos** fallos reales. En Python, un canto
+que se apagaba hacia el lado equivocado y quedaba por debajo de 3:1. En Kotlin,
+una mezcla de colores que interpolaba en otro espacio y dejaba el tallado en
+2,79:1 — **con las constantes coincidiendo perfectamente**. Por eso la paridad
+comprueba ahora los colores DERIVADOS, no solo las constantes.
 
 ## Empezar
 
@@ -59,8 +67,19 @@ bandeja = Bandeja()
 bandeja.agregar(Pozo(QLabel("₡128 400")))
 ```
 
+**Compose**
+
+```kotlin
+import wulf.compose.superficies.*
+import wulf.compose.tokens.*
+
+WulfTheme(WulfAcento.ORO) {
+    WulfBandeja { WulfPozo { Text("₡128 400") } }
+}
+```
+
 Cada una tiene su README con el detalle: [`flutter/`](flutter/README.md) ·
-[`PyQT/`](PyQT/README.md).
+[`PyQT/`](PyQT/README.md) · [`Compose/`](Compose/README.md).
 
 ## Lo que hace que se vea así no son los colores
 
@@ -85,9 +104,15 @@ de código.
 contraste, los controles.
 
 **Viaja a medias:** el relieve. En Flutter son tres capas de widget; en Qt, tres
-pasadas de `QPainter`. Funciona en las dos y está probado, pero es la pieza donde
-las implementaciones son de verdad distintas — una hoja de estilo no sabe decir
-"pintá este mismo glifo tres veces desplazado".
+pasadas de `QPainter`; en Compose, otra vez tres capas. Funciona en las tres y
+está probado, pero es la pieza donde las implementaciones son de verdad distintas
+— una hoja de estilo no sabe decir "pintá este mismo glifo tres veces
+desplazado".
+
+**Viaja, pero hay que escribirlo:** la mezcla de colores. Cada plataforma
+interpola en un espacio distinto por su cuenta, así que las tres llevan su propia
+mezcla canal a canal en sRGB. Delegar en la de la plataforma es lo que rompió el
+contraste del port de Kotlin.
 
 **No viaja:** iconos y cualquier widget que sepa de un dominio concreto.
 
@@ -101,5 +126,5 @@ riesgo. Estas librerías son para los proyectos que vienen.
 
 ## Estado
 
-**0.1.0 las dos, sin publicar.** El código está probado en aparatos reales, pero
+**0.1.0 las tres, sin publicar.** El código está probado en aparatos reales, pero
 la API puede moverse mientras no haya un segundo proyecto usándola.

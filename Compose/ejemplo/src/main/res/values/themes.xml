@@ -1,0 +1,5 @@
+<resources>
+    <!-- Sin barra propia: la pantalla la pinta Compose entera, y una ActionBar
+         de Android encima rompería la bandeja continua (regla 2). -->
+    <style name="Theme.Wulfenite" parent="android:Theme.Material.NoActionBar" />
+</resources>
