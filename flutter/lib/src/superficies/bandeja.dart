@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../foco/foco.dart';
 import '../tokens/tema.dart';
 
 /// El plano de la bandeja: un unico contenedor continuo por pantalla, con el
@@ -42,7 +43,12 @@ class WulfBandeja extends StatelessWidget {
 ///
 /// Radio 4, no 12: el interior de una bandeja es rectilineo. El radio grande
 /// vive solo en el canto exterior.
-class WulfPozo extends StatelessWidget {
+///
+/// Un pozo tocable es ademas **enfocable**: recibe el foco del mando o del
+/// teclado y lo muestra subiendo el canto a metal pleno de 3 y aclarando el
+/// relleno (regla 12). Sin eso la app no se puede usar en un televisor — el
+/// mando mueve el foco y nada en pantalla dice donde esta.
+class WulfPozo extends StatefulWidget {
   /// Un compartimento con [child] dentro.
   ///
   /// Con [onTap] u [onLongPress] el pozo se vuelve tocable y garantiza el
@@ -53,6 +59,7 @@ class WulfPozo extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.seleccionado = false,
+    this.enfocable = true,
     this.padding = const EdgeInsets.all(WulfSpacing.paddingCelda),
     this.radio = WulfRadius.pozo,
   });
@@ -67,9 +74,16 @@ class WulfPozo extends StatelessWidget {
   /// con el toque simple — exportar un reporte, por ejemplo.
   final VoidCallback? onLongPress;
 
-  /// Seleccion actual: la cresta pasa al oro de laca y engorda. El acento
+  /// Seleccion actual: la cresta pasa al metal pleno y engorda. El acento
   /// nunca se usa decorativamente, solo para esto y para accion primaria.
   final bool seleccionado;
+
+  /// Si entra en el recorrido del mando y del teclado.
+  ///
+  /// En falso el pozo se toca pero no se puede alcanzar sin pantalla tactil.
+  /// Solo para lo que ya es alcanzable de otra forma; apagarlo por costumbre es
+  /// como una pantalla se vuelve inusable con mando.
+  final bool enfocable;
 
   /// Aire entre el canto y el contenido. El contenido nunca toca el borde.
   final EdgeInsetsGeometry padding;
@@ -80,20 +94,39 @@ class WulfPozo extends StatelessWidget {
   final double radio;
 
   @override
+  State<WulfPozo> createState() => _WulfPozoState();
+}
+
+class _WulfPozoState extends State<WulfPozo> {
+  bool _enfocado = false;
+
+  @override
   Widget build(BuildContext context) {
     final laca = lacaDe(context);
-    final acento = Theme.of(context).colorScheme.primary;
-    final borde = BorderRadius.circular(radio);
+    final tema = Theme.of(context);
+    final acento = tema.colorScheme.primary;
+    final borde = BorderRadius.circular(widget.radio);
+    final tocable = widget.onTap != null || widget.onLongPress != null;
 
-    Widget contenido = Padding(padding: padding, child: child);
+    // Enfocado gana sobre seleccionado: navegando con el mando se RECORRE la
+    // seleccion, asi que lo que hay que ver moverse es el foco.
+    final fondo = _enfocado ? wulfTonoEnfocado(laca.pozo, tema.brightness) : laca.pozo;
 
-    if (onTap != null || onLongPress != null) {
+    Widget contenido = Padding(padding: widget.padding, child: widget.child);
+
+    if (tocable) {
       contenido = Material(
         type: MaterialType.transparency,
         child: InkWell(
-          onTap: onTap,
-          onLongPress: onLongPress,
+          onTap: widget.onTap,
+          onLongPress: widget.onLongPress,
           borderRadius: borde,
+          canRequestFocus: widget.enfocable,
+          onFocusChange: (tiene) => setState(() => _enfocado = tiene),
+          // El resaltado de foco de fabrica es un rectangulo translucido, que
+          // es exactamente la senal que este sistema no usa. Lo apaga: el foco
+          // lo dice el canto.
+          focusColor: Colors.transparent,
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: wulfObjetivoTactilMin),
             child: contenido,
@@ -109,15 +142,19 @@ class WulfPozo extends StatelessWidget {
         // distintos junto con `borderRadius`, y el labio del hueco atrapa luz
         // en todo su perimetro de todas formas.
         border: Border.all(
-          color: seleccionado ? acento : laca.paredCresta,
-          width: seleccionado ? 2 : 1,
+          color: _enfocado || widget.seleccionado ? acento : laca.paredCresta,
+          width: switch ((_enfocado, widget.seleccionado)) {
+            (true, _) => WulfCanto.enfocado,
+            (false, true) => WulfCanto.seleccionado,
+            _ => WulfCanto.reposo,
+          },
         ),
         // La sombra de contacto ocupa solo la primera franja del pozo: es el
         // canto de la pared, no un degradado decorativo de arriba a abajo.
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [laca.pozoContacto, laca.pozo],
+          colors: [laca.pozoContacto, fondo],
           stops: const [0.0, 0.07],
         ),
       ),

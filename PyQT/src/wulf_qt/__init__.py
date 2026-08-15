@@ -27,7 +27,7 @@ bandeja.show()
 app.exec()
 ```
 
-Las once reglas, con el porqué de cada una, están en `../doc/reglas.md`.
+Las doce reglas, con el porqué de cada una, están en `../doc/reglas.md`.
 """
 
 from .componentes import (
@@ -40,9 +40,12 @@ from .componentes import (
     boton_primario,
 )
 from .reticula import COLUMNAS, Ancho, Bandeja, Celda, Cuadricula, Pozo
+from .aviso import Aviso, mostrar_aviso
+from .foco import Canto, tono_enfocado
 from .tema import ATENUADO, BANDEJA, POZO, aplicar, hoja_de_estilo, paleta
 from .texto import FUSION, PROFUNDIDAD, EtiquetaAjustada, Tallado, color_tallado
 from .tokens import (
+    SEPARACION_FOCO,
     APAGADO_RIBETE,
     GAP_CELDA,
     GAP_GRUPO,
@@ -72,8 +75,10 @@ __all__ = [
     "GAP_GRUPO", "LACAS", "METALES", "OBJETIVO_TACTIL_MIN", "PADDING_CELDA",
     "PADDING_CELDA_GRANDE", "PARED", "POZO", "PROFUNDIDAD", "RADIO_BANDEJA",
     "RADIO_POZO", "RIM", "SOBRE_METAL", "UNIDAD",
-    "Acciones", "Acento", "Ancho", "Atenuado", "Bandeja", "Celda", "Cuadricula",
+    "Acciones", "Acento", "Ancho", "Atenuado", "Aviso", "Bandeja", "Canto", "Celda",
+    "Cuadricula",
     "Dialogo", "Enlace", "EtiquetaAjustada", "Laca", "Modo", "Pozo", "Tallado",
-    "aplicar", "boton", "boton_plano", "boton_primario", "canto_del_pozo",
+    "SEPARACION_FOCO", "aplicar", "boton", "boton_plano", "boton_primario",
+    "canto_del_pozo", "mostrar_aviso", "tono_enfocado",
     "color_tallado", "contraste", "hoja_de_estilo", "mezclar", "paleta",
 ]

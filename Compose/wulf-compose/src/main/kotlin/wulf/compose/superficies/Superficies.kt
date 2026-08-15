@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -18,12 +19,18 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import wulf.compose.foco.WULF_SEPARACION_FOCO
+import wulf.compose.foco.WulfCanto
+import wulf.compose.foco.recordarEnfocado
+import wulf.compose.superficies.tonoDeToque
+import wulf.compose.texto.isLight
 import wulf.compose.tokens.WulfRadius
 import wulf.compose.tokens.WulfSpacing
 import wulf.compose.tokens.WulfTheme
@@ -85,6 +92,15 @@ fun WulfBandeja(
  *
  * Con [onTap] u [onLongPress] el pozo se vuelve tocable y garantiza el objetivo
  * táctil mínimo, así que no hace falta envolverlo en un botón.
+ *
+ * Un pozo tocable es además **enfocable**: recibe el foco del mando o del
+ * teclado y lo muestra subiendo el canto a metal pleno de 3 dp y aclarando el
+ * relleno (regla 12). Sin eso la app es literalmente inusable en un televisor —
+ * el mando mueve el foco y nada en pantalla dice dónde está.
+ *
+ * @param enfocable en falso el pozo se toca pero no entra en el recorrido del
+ *   mando. Solo para lo que ya es alcanzable de otra forma; apagarlo por
+ *   costumbre es cómo una pantalla se vuelve inalcanzable sin pantalla táctil.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -93,16 +109,27 @@ fun WulfPozo(
     onTap: (() -> Unit)? = null,
     onLongPress: (() -> Unit)? = null,
     seleccionado: Boolean = false,
+    enfocable: Boolean = true,
     padding: PaddingValues = PaddingValues(WulfSpacing.paddingCelda),
     radio: Dp = WulfRadius.pozo,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val laca = WulfTheme.laca
-    val acento = MaterialTheme.colorScheme.primary
+    val esquema = MaterialTheme.colorScheme
+    val acento = esquema.primary
     val forma = RoundedCornerShape(radio)
+    // UNA sola fuente de interacciones para el toque, el foco y el pintado: con
+    // dos, el componente mira una mientras el sistema mueve el foco en la otra y
+    // el canto no se entera nunca.
     val interacciones = remember { MutableInteractionSource() }
+    val enfocado by recordarEnfocado(interacciones)
 
     val tocable = onTap != null || onLongPress != null
+    val fondoPozo = if (enfocado) {
+        tonoDeToque(laca.pozo, esquema.isLight().not(), WULF_SEPARACION_FOCO)
+    } else {
+        laca.pozo
+    }
 
     Box(
         modifier = modifier
@@ -114,14 +141,21 @@ fun WulfPozo(
                 Brush.verticalGradient(
                     colorStops = arrayOf(
                         0f to laca.pozoContacto,
-                        0.07f to laca.pozo,
-                        1f to laca.pozo,
+                        0.07f to fondoPozo,
+                        1f to fondoPozo,
                     ),
                 ),
             )
             .border(
-                width = if (seleccionado) 2.dp else 1.dp,
-                color = if (seleccionado) acento else laca.paredCresta,
+                // Enfocado gana sobre seleccionado: navegando con el mando se
+                // RECORRE la selección, así que lo que hay que ver moverse es el
+                // foco.
+                width = when {
+                    enfocado -> WulfCanto.enfocado
+                    seleccionado -> WulfCanto.seleccionado
+                    else -> WulfCanto.reposo
+                },
+                color = if (enfocado || seleccionado) acento else laca.paredCresta,
                 shape = forma,
             )
             .then(
@@ -143,6 +177,13 @@ fun WulfPozo(
                             indication = LocalIndication.current,
                             onClick = { onTap?.invoke() },
                         )
+                },
+            )
+            .then(
+                if (tocable && enfocable) {
+                    Modifier.focusable(interactionSource = interacciones)
+                } else {
+                    Modifier
                 },
             )
             .padding(padding),

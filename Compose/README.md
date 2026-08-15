@@ -2,7 +2,7 @@
 
 Wulfenite para **Android nativo**, en Kotlin con Jetpack Compose. Gemela de
 [`flutter/`](../flutter/README.md) y de [`PyQT/`](../PyQT/README.md): los mismos
-hexadecimales, el mismo espaciado, las mismas [once reglas](../doc/reglas.md).
+hexadecimales, el mismo espaciado, las mismas [doce reglas](../doc/reglas.md).
 
 ```kotlin
 WulfTheme(WulfAcento.JADE) {
@@ -26,13 +26,14 @@ otro motivo y Flutter no está sobre la mesa.
 | `superficies/` | Bandeja y pozo — la geometría invertida, la cresta de 1 dp, la onda del toque |
 | `reticula/` | Las seis columnas y los tres tamaños |
 | `texto/` | El relieve grabado y la etiqueta que encoge |
-| `componentes/` | Diálogo, acciones, panel, enlace y falla |
+| `componentes/` | Diálogo, acciones, panel, enlace, falla, aviso y controles |
+| `foco/` | Los tres escalones del canto — lo que hace usable la app con mando |
 | `ejemplo/` | El banco de estilo: una app que toca todas las piezas |
 
 ## Correrlo
 
 ```bash
-./gradlew :wulf-compose:testDebugUnitTest   # 34 pruebas, sin emulador
+./gradlew :wulf-compose:testDebugUnitTest   # 40 pruebas, sin emulador
 ./gradlew :ejemplo:installDebug             # el banco de estilo en un aparato
 ```
 
@@ -42,6 +43,19 @@ Nada de eso necesita pintar píxeles, y así se ejecutan en segundos.
 
 `local.properties` apunta al SDK de esta máquina y está fuera del control de
 versiones; hay que recrearlo con `sdk.dir=/ruta/al/Android/Sdk`.
+
+## El foco, que es lo que la hace usable en televisión
+
+Todo lo que se puede activar muestra cuándo tiene el foco: el canto sube a metal
+pleno de 3 dp y el relleno se aclara ([regla 12](../doc/reglas.md)). Un `WulfPozo`
+tocable es enfocable por defecto; `enfocable = false` lo saca del recorrido.
+
+No es una mejora de accesibilidad: **sin esto la app no se puede usar con un
+mando**. El mando mueve el foco y nada en pantalla dice dónde está.
+
+Se comprobó recorriendo el banco de estilo con el D-pad. Ahí salió un fallo que
+no se veía leyendo el código: el enlace enfocado se marcaba con el recuadro gris
+de fábrica de Compose, la única señal de toda la app que no era la cresta.
 
 ## Tres cosas que este port tuvo que decidir
 
@@ -98,8 +112,8 @@ Flutter, donde hubo que anular el velo blanco de fábrica botón por botón.
 
 ## Estado
 
-**0.1.0, sin publicar.** Compila, pasa sus 34 pruebas y el banco de estilo corre
-en un aparato real. La API puede moverse mientras no haya un segundo proyecto
+**0.1.0, sin publicar.** Compila, pasa sus 40 pruebas y el banco de estilo corre
+—y se recorre con el D-pad— en un aparato real. La API puede moverse mientras no haya un segundo proyecto
 usándola.
 
 Lo que **no** está portado: no hay pruebas de interfaz (harían falta Robolectric

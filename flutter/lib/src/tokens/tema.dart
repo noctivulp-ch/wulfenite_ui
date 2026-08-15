@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../foco/foco.dart';
 import '../tokens/efectos.dart';
 import '../superficies/tinta.dart';
 
@@ -363,6 +364,18 @@ Color _tonoDeToque(Color pozo, Brightness brightness, double separacion) {
   return Color.lerp(pozo, hacia, separacion.clamp(0.0, 1.0))!;
 }
 
+/// El contorno de un control, que engorda al recibir el foco (regla 12).
+///
+/// Se resuelve por estado y no con un valor fijo porque es la única forma de que
+/// el foco se vea en un botón: sin esto, un mando de televisor recorre los
+/// botones de la app y nada en pantalla lo dice.
+WidgetStateProperty<BorderSide> _contornoConFoco(Color color, double reposo) {
+  return WidgetStateProperty.resolveWith((estados) {
+    final enfocado = estados.contains(WidgetState.focused);
+    return BorderSide(color: color, width: enfocado ? WulfCanto.enfocado : reposo);
+  });
+}
+
 /// Los botones pintan un velo propio (`overlayColor`) ADEMÁS del splash, y de
 /// fábrica ese velo es blanco translúcido. Era lo que hacía que el toque se
 /// viera con color en unos sitios y blanco en otros: donde había un botón,
@@ -448,9 +461,11 @@ ThemeData buildWulfTheme(
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(0, wulfObjetivoTactilMin),
-        side: BorderSide(color: scheme.primary),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(WulfRadius.pozo)),
-      ).copyWith(overlayColor: _sinVeloDeBoton),
+      ).copyWith(
+        overlayColor: _sinVeloDeBoton,
+        side: _contornoConFoco(scheme.primary, WulfCanto.reposo),
+      ),
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: SegmentedButton.styleFrom(
@@ -465,7 +480,16 @@ ThemeData buildWulfTheme(
           vertical: WulfSpacing.paddingCelda,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(WulfRadius.pozo)),
-      ).copyWith(overlayColor: _sinVeloDeBoton),
+      ).copyWith(
+        overlayColor: _sinVeloDeBoton,
+        // En el relleno el contorno solo aparece con el foco: el metal ya ocupa
+        // toda la pieza, asi que el canto se dibuja con el color del texto para
+        // que se separe de el.
+        side: WidgetStateProperty.resolveWith((estados) {
+          if (!estados.contains(WidgetState.focused)) return BorderSide.none;
+          return BorderSide(color: scheme.onPrimary, width: WulfCanto.enfocado);
+        }),
+      ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
@@ -474,7 +498,16 @@ ThemeData buildWulfTheme(
           horizontal: WulfSpacing.paddingCelda,
           vertical: WulfSpacing.unidad,
         ),
-      ).copyWith(overlayColor: _sinVeloDeBoton),
+      ).copyWith(
+        overlayColor: _sinVeloDeBoton,
+        // Plano no lleva contorno en reposo — es lo que lo hace plano—, pero
+        // enfocado tiene que verse igual que los demas o el mando lo salta sin
+        // que nadie note que paso por el.
+        side: WidgetStateProperty.resolveWith((estados) {
+          if (!estados.contains(WidgetState.focused)) return BorderSide.none;
+          return BorderSide(color: scheme.primary, width: WulfCanto.enfocado);
+        }),
+      ),
     ),
     iconButtonTheme: IconButtonThemeData(style: ButtonStyle(overlayColor: _sinVeloDeBoton)),
     listTileTheme: ListTileThemeData(

@@ -10,20 +10,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import wulf.compose.componentes.WulfAcciones
+import wulf.compose.componentes.WulfAvisoHost
+import wulf.compose.componentes.WulfBoton
+import wulf.compose.componentes.WulfBotonPlano
+import wulf.compose.componentes.WulfBotonPrimario
+import wulf.compose.componentes.WulfCampo
 import wulf.compose.componentes.WulfEnlace
+import wulf.compose.componentes.WulfInterruptor
+import wulf.compose.componentes.avisos
 import wulf.compose.reticula.WulfCelda
 import wulf.compose.reticula.WulfCuadricula
 import wulf.compose.superficies.WulfBandeja
@@ -65,22 +70,27 @@ fun Banco() {
     val efectos = if (relieve) WulfEfectos() else WulfEfectos(setOf(WulfEfectoPesado.TALLADO))
 
     WulfTheme(acento = acento, oscuro = oscuro, efectos = efectos) {
-        WulfBandeja(Modifier.fillMaxSize()) {
-            Column(
-                Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(WulfSpacing.pared),
-            ) {
-                Mandos(
-                    acento = acento,
-                    oscuro = oscuro,
-                    relieve = relieve,
-                    onAcento = { acento = it },
-                    onModo = { oscuro = !oscuro },
-                    onRelieve = { relieve = !relieve },
-                )
-                Reticula()
-                Tallado()
-                Acciones()
+        // El anfitrión de avisos envuelve la pantalla una vez. Sin él, pedir un
+        // aviso revienta con un mensaje claro en vez de tragárselo en silencio.
+        WulfAvisoHost {
+            WulfBandeja(Modifier.fillMaxSize()) {
+                Column(
+                    Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(WulfSpacing.pared),
+                ) {
+                    Mandos(
+                        acento = acento,
+                        oscuro = oscuro,
+                        relieve = relieve,
+                        onAcento = { acento = it },
+                        onModo = { oscuro = !oscuro },
+                        onRelieve = { relieve = !relieve },
+                    )
+                    Reticula()
+                    Tallado()
+                    Controles()
+                    Acciones()
+                }
             }
         }
     }
@@ -102,19 +112,18 @@ private fun Mandos(
             Row(horizontalArrangement = Arrangement.spacedBy(WulfSpacing.unidad)) {
                 WulfAcento.entries.forEach { metal ->
                     if (metal == acento) {
-                        FilledTonalButton(onClick = { onAcento(metal) }) { Text(metal.name) }
+                        WulfBotonPrimario(metal.name, onClick = { onAcento(metal) })
                     } else {
-                        OutlinedButton(onClick = { onAcento(metal) }) { Text(metal.name) }
+                        WulfBoton(metal.name, onClick = { onAcento(metal) })
                     }
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(WulfSpacing.unidad)) {
-                OutlinedButton(onClick = onModo) {
-                    Text(if (oscuro) "Modo oscuro" else "Modo claro")
-                }
-                OutlinedButton(onClick = onRelieve) {
-                    Text(if (relieve) "Relieve activo" else "Relieve apagado")
-                }
+                WulfBoton(if (oscuro) "Modo oscuro" else "Modo claro", onClick = onModo)
+                WulfBoton(
+                    if (relieve) "Relieve activo" else "Relieve apagado",
+                    onClick = onRelieve,
+                )
             }
         }
     }
@@ -191,6 +200,39 @@ private fun Tallado() {
     }
 }
 
+/**
+ * Los controles del sistema, y el aviso.
+ *
+ * Recorrer esta sección con un teclado o un mando es la forma de ver la regla
+ * 12: el canto de lo enfocado sube a 3 dp y el relleno se aclara.
+ */
+@Composable
+private fun Controles() {
+    var texto by remember { mutableStateOf("") }
+    var encendido by remember { mutableStateOf(true) }
+    val aviso = avisos()
+
+    WulfPozo(Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(WulfSpacing.unidad)) {
+            Text("Controles", style = MaterialTheme.typography.titleLarge)
+            WulfCampo(
+                valor = texto,
+                onValor = { texto = it },
+                etiqueta = "Nombre",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(WulfSpacing.unidad),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                WulfInterruptor(encendido = encendido, onCambio = { encendido = it })
+                Text("Sincronizar", style = MaterialTheme.typography.bodyMedium)
+            }
+            WulfBoton("Mostrar un aviso", onClick = { aviso.mostrar("Guardado") })
+        }
+    }
+}
+
 /** Confirmar a la derecha, y lo destructivo lejos del pulgar que confirma. */
 @Composable
 private fun Acciones() {
@@ -199,11 +241,11 @@ private fun Acciones() {
             Text("Acciones", style = MaterialTheme.typography.titleLarge)
             WulfAcciones(
                 izquierda = listOf(
-                    { TextButton(onClick = {}) { Text("Cancelar") } },
-                    { TextButton(onClick = {}) { Text("Eliminar") } },
+                    { WulfBotonPlano("Cancelar", onClick = {}) },
+                    { WulfBotonPlano("Eliminar", onClick = {}) },
                 ),
                 derecha = listOf(
-                    { FilledTonalButton(onClick = {}) { Text("Guardar") } },
+                    { WulfBotonPrimario("Guardar", onClick = {}) },
                 ),
             )
         }

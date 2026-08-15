@@ -19,6 +19,8 @@ from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QApplication
 
 from .tokens import (
+    SEPARACION_FOCO,
+    Canto,
     LACAS,
     METALES,
     PADDING_CELDA,
@@ -111,8 +113,16 @@ def hoja_de_estilo(acento: Acento, modo: Modo) -> str:
     # El metal al pasar por encima y al pulsar: hacia el texto y hacia el fondo.
     metal_hover = mezclar(metal, laca.texto_en_pozo, 0.15)
     metal_pulsado = mezclar(metal, laca.bandeja, 0.20)
+    # El pozo cuando tiene el foco (regla 12): separado de su reposo en la
+    # dirección que contrasta. Se calcula acá y no se importa de `foco` para no
+    # cerrar un ciclo — ese módulo importa `mezclar` de este.
+    pozo_enfocado = mezclar(
+        laca.pozo, "#FFFFFF" if modo is Modo.OSCURO else "#000000", SEPARACION_FOCO
+    )
 
-    return f"""
+    from .aviso import qss_del_aviso
+
+    return qss_del_aviso(laca.pozo, metal, laca.texto_en_pozo) + f"""
 /* ── La bandeja: un plano continuo, sin nada flotando encima ─────────────── */
 QMainWindow, QDialog {{
     background-color: {laca.bandeja};
@@ -141,7 +151,14 @@ QFrame[class="{POZO}"], QWidget[class="{POZO}"] {{
     color: {laca.texto_en_pozo};
 }}
 QFrame[class="{POZO}"][seleccionado="true"] {{
-    border: 2px solid {metal};
+    border: {Canto.SELECCIONADO}px solid {metal};
+}}
+/* Enfocado gana sobre seleccionado: recorriendo con el teclado se RECORRE la
+   selección, así que lo que hay que ver moverse es el foco. Por eso lleva
+   además el relleno aclarado — los dos estados caen juntos todo el tiempo. */
+QFrame[class="{POZO}"]:focus, QWidget[class="{POZO}"]:focus {{
+    border: {Canto.ENFOCADO}px solid {metal};
+    background: {pozo_enfocado};
 }}
 
 /* ── Entradas de texto: también son pozos ────────────────────────────────── */
@@ -156,7 +173,8 @@ QLineEdit, QTextEdit, QPlainTextEdit, QSpinBox, QDoubleSpinBox, QComboBox {{
 }}
 QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus,
 QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus {{
-    border: 2px solid {metal};
+    border: {Canto.ENFOCADO}px solid {metal};
+    background-color: {pozo_enfocado};
 }}
 
 /* ── Botones ─────────────────────────────────────────────────────────────────
@@ -173,6 +191,12 @@ QPushButton {{
 QPushButton:hover {{ background-color: {mezclar(laca.pozo, laca.texto_en_pozo, 0.06)}; }}
 QPushButton:pressed {{ background-color: {laca.pozo_contacto}; }}
 QPushButton:disabled {{ color: {laca.texto_secundario_en_pozo}; }}
+/* Sin esto se pulsa Tab, el foco recorre los botones y nada en pantalla lo dice
+   — la app queda inusable sin ratón. */
+QPushButton:focus {{
+    border: {Canto.ENFOCADO}px solid {metal};
+    background-color: {pozo_enfocado};
+}}
 
 QPushButton[primario="true"] {{
     background-color: {metal};
@@ -182,12 +206,24 @@ QPushButton[primario="true"] {{
 }}
 QPushButton[primario="true"]:hover {{ background-color: {metal_hover}; }}
 QPushButton[primario="true"]:pressed {{ background-color: {metal_pulsado}; }}
+/* En el relleno el canto se dibuja con el color del TEXTO: el metal ya ocupa
+   toda la pieza, así que un canto de metal encima de metal no se vería. */
+QPushButton[primario="true"]:focus {{
+    border: {Canto.ENFOCADO}px solid {sobre_metal};
+    background-color: {metal};
+}}
 
 QPushButton[plano="true"] {{
     background: transparent;
     border: 1px solid transparent;
 }}
 QPushButton[plano="true"]:hover {{ border: 1px solid {canto}; }}
+/* Plano no lleva canto en reposo —es lo que lo hace plano— pero enfocado tiene
+   que verse igual que los demás, o el foco lo salta sin que nadie lo note. */
+QPushButton[plano="true"]:focus {{
+    border: {Canto.ENFOCADO}px solid {metal};
+    background: transparent;
+}}
 
 /* ── Listas y tablas ─────────────────────────────────────────────────────── */
 QListView, QTreeView, QTableView {{

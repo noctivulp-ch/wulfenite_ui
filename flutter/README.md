@@ -54,7 +54,7 @@ modo oscuro, donde el salto de valor entre dos superficies oscuras no llega a
 la fórmula WCAG sobre el tema realmente construido, en los tres metales por las
 dos luminosidades. Añadir un metal que no cumpla rompe la prueba.
 
-Las once reglas, con el porqué de cada una, están en
+Las doce reglas, con el porqué de cada una, están en
 [`doc/reglas.md`](../doc/reglas.md).
 
 ## El ejemplo es un banco de estilo

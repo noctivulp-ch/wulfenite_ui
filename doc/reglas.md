@@ -1,6 +1,6 @@
 # Las reglas
 
-Lo que hace que esto se vea así **no son los colores**: son estas once reglas y
+Lo que hace que esto se vea así **no son los colores**: son estas doce reglas y
 las pruebas que las vigilan. Los tokens sin las reglas dan otra app cualquiera
 con una paleta bonita.
 
@@ -179,6 +179,39 @@ Puede no mostrar la dirección: la firma del autor dice su nombre, no la URL. Lo
 que no puede es no parecer tocable. Un texto que hace algo al tocarlo sin
 anunciarlo no es discreto, es indescifrable.
 
+### 12. El foco se ve, y se ve con el mismo canto
+
+Todo lo que se puede activar tiene que **decir cuándo lo tiene el foco** — el de
+un mando, el de un teclado, el de un conmutador de accesibilidad. Y lo dice con
+la señal que el sistema ya tiene para decir "este": el canto de la regla 1,
+subido un escalón.
+
+| estado | canto | relleno |
+|---|---|---|
+| reposo | cresta (metal apagado), 1 dp | pozo |
+| seleccionado | metal pleno, 2 dp | pozo |
+| enfocado | metal pleno, 3 dp | pozo aclarado |
+
+Tres cosas que no son arbitrarias:
+
+- **3 dp y no 2.** Un televisor se mira a tres metros. Un escalón que en la mano
+  se distingue perfectamente, ahí no existe. Es el mismo motivo por el que el
+  objetivo táctil es de 48 dp y no de 32.
+- **Enfocado gana sobre seleccionado.** Navegando con el mando se *recorre* la
+  selección, así que lo que hay que ver moverse es el foco. Por eso enfocado
+  lleva **además** el relleno aclarado: los dos estados caen juntos todo el
+  tiempo y tienen que seguir distinguiéndose.
+- **Ni halo, ni sombra, ni agrandar.** Sería estrenar una señal nueva justo donde
+  la regla 1 más importa, y una sombra a tres metros bajo la luz de una sala no
+  se ve.
+
+Lo que se aclara el pozo enfocado es lo mismo que se separa el tono del toque:
+el aparato dice "acá estás" con el mismo material se llegue con el dedo o con el
+mando.
+
+Sin esto una app **no se puede usar en un televisor**. No es una mejora de
+accesibilidad: el mando mueve el foco y nada en pantalla dice dónde está.
+
 ---
 
 ## Contraste verificado
@@ -198,5 +231,22 @@ sesión; texto ≥4.5:1, bordes de superficie ≥3:1 por WCAG 1.4.11).
 Los 3 metales, cada uno como texto sobre bandeja, como texto sobre pozo y
 como relleno con su propio color encima: **18 pares, 0 fallas**. El peor caso
 es 4.65:1 (oro como texto sobre pozo verde), por encima del mínimo AA.
+
+---
+
+## La mezcla de colores es propia en las tres
+
+Los colores derivados —el canto, el tallado, el tono del toque— se calculan
+mezclando **canal a canal en sRGB**, con una función escrita en cada paquete. No
+se usa la de la plataforma.
+
+Suena a manía hasta que se mide: Compose interpola en Oklab, y con la misma
+fusión el tallado marcado en modo oscuro salía a **2,79:1** — por debajo del piso
+de 3:1 que este documento exige— frente a 3,09:1 con la mezcla correcta. Y todo
+eso **con las constantes de la paleta coincidiendo perfectamente** entre los tres
+paquetes.
+
+Por eso las pruebas de paridad comparan los colores DERIVADOS y no solo las
+constantes. Una paleta idéntica no garantiza un sistema idéntico.
 
 ---

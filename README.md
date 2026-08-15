@@ -10,7 +10,7 @@ canto de un píxel que es lo único que carga la profundidad.
 
 ```
 wulfenite_ui/
-├── doc/reglas.md   ← las once reglas. Lo único que de verdad define el sistema
+├── doc/reglas.md   ← las doce reglas. Lo único que de verdad define el sistema
 ├── flutter/        ← paquete Dart · wulf_flutter
 ├── PyQT/           ← paquete Python · wulf_qt
 └── Compose/        ← paquete Kotlin · wulf-compose (Android nativo)
@@ -22,7 +22,7 @@ wulfenite_ui/
 |---|---|---|---|
 | Paquete | `wulf_flutter` | `wulf_qt` | `wulf-compose` |
 | Cómo se aplica | `buildWulfTheme(WulfAcento.oro)` | `aplicar(app, Acento.ORO, Modo.OSCURO)` | `WulfTheme(WulfAcento.ORO) { }` |
-| Pruebas | 69 | 44 | 34 |
+| Pruebas | 80 | 77 | 40 |
 | Ejemplo | `example/` | `ejemplo/banco.py` | `ejemplo/` |
 
 Comparten prefijo de paquete (`wulf`) para que convivan sin chocar, y comparten
@@ -83,7 +83,7 @@ Cada una tiene su README con el detalle: [`flutter/`](flutter/README.md) ·
 
 ## Lo que hace que se vea así no son los colores
 
-Son las [once reglas](doc/reglas.md) y las pruebas que las vigilan. Los tokens
+Son las [doce reglas](doc/reglas.md) y las pruebas que las vigilan. Los tokens
 sin las reglas dan otra app cualquiera con una paleta bonita.
 
 Tres ejemplos de regla que está **dentro del componente**, no en una guía que
@@ -101,7 +101,7 @@ de código.
 ## Qué viaja entre las dos, y qué no
 
 **Viaja entero:** los tokens, la retícula, el reparto de acciones, el piso de
-contraste, los controles.
+contraste, los controles, el aviso y los tres escalones del foco.
 
 **Viaja a medias:** el relieve. En Flutter son tres capas de widget; en Qt, tres
 pasadas de `QPainter`; en Compose, otra vez tres capas. Funciona en las tres y
@@ -123,6 +123,24 @@ llevaba meses probado en teléfonos reales antes de mudarse acá. Esa app **no
 depende de esto**: desde su versión 1.0.0 cada cambio ahí es una actualización
 sobre datos de un negocio, y una refactorización estética no justifica ese
 riesgo. Estas librerías son para los proyectos que vienen.
+
+## Qué falta para que las tres digan lo mismo
+
+La paridad no está cerrada, y conviene tenerlo escrito en vez de descubrirlo al
+necesitar la pieza:
+
+| pieza | Flutter | PyQT | Compose |
+|---|---|---|---|
+| Tokens, retícula, tallado, diálogo, enlace, etiqueta | ✓ | ✓ | ✓ |
+| Aviso | ✓ | ✓ | ✓ |
+| Foco / D-pad (regla 12) | ✓ | ✓ | ✓ |
+| Falla | ✓ | — | ✓ |
+| Velo superior | ✓ | — | ✓ |
+| Onda del toque | ✓ | — | ✓ |
+
+Las tres que le faltan a PyQT son de escritorio, donde pesan menos: no hay
+muesca de cámara que esquivar con un velo, y Qt ya trae su propia realimentación
+al pulsar. Aun así son huecos, no decisiones.
 
 ## Estado
 

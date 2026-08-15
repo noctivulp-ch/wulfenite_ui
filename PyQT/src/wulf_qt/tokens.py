@@ -200,3 +200,41 @@ def _luminancia(hexadecimal: str) -> float:
 
     r, g, b = _rgb(hexadecimal)
     return 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b)
+
+
+class Canto:
+    """Grosor del canto según el estado, en píxeles. Es la regla 12 en números.
+
+    El foco NO estrena una señal propia: usa la que el sistema ya tiene para
+    decir "este", el canto de la regla 1, subida un escalón más. Inventarle un
+    halo o una sombra sería contradecir la regla 1 justo donde más se nota.
+
+    | estado | canto | relleno |
+    |---|---|---|
+    | reposo | cresta (metal apagado), 1 | pozo |
+    | seleccionado | metal pleno, 2 | pozo |
+    | enfocado | metal pleno, 3 | pozo aclarado |
+
+    Que enfocado lleve **además** el relleno separado es lo que lo distingue de
+    seleccionado cuando los dos caen a la vez, que es el caso normal recorriendo
+    una lista con el teclado: se recorre la selección.
+    """
+
+    #: En reposo. La cresta, que es material de bandeja.
+    REPOSO = 1
+
+    #: Seleccionado: metal pleno.
+    SELECCIONADO = 2
+
+    #: Enfocado por teclado o mando.
+    #:
+    #: Tres y no dos: el escalón que en la mano se distingue perfectamente, a
+    #: distancia de televisor no existe. Mismo motivo por el que el objetivo
+    #: táctil es de 48 y no de 32.
+    ENFOCADO = 3
+
+
+#: Cuánto se aclara el pozo enfocado. Coincide a propósito con la separación de
+#: la onda del toque de las gemelas: el aparato dice "acá estás" con el mismo
+#: material se llegue con el dedo, con el mando o con el teclado.
+SEPARACION_FOCO = 0.10
