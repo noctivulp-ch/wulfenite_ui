@@ -3,7 +3,12 @@ package wulf.compose.foco
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -61,3 +66,42 @@ const val WULF_SEPARACION_FOCO = 0.10f
 @Composable
 fun recordarEnfocado(interacciones: MutableInteractionSource): State<Boolean> =
     interacciones.collectIsFocusedAsState()
+
+/**
+ * Pide el foco para este elemento cuando la pantalla aparece.
+ *
+ * **Una pantalla sin foco inicial deja al mando sin punto de partida**: la
+ * primera pulsación se gasta en que el sistema elija por su cuenta, y suele
+ * elegir mal — lo primero del árbol, que casi nunca es lo que se quiere hacer.
+ *
+ * Va sobre el elemento que la pantalla quiere que sea el destino de entrada, y
+ * es una línea:
+ *
+ * ```kotlin
+ * WulfPozo(onTap = ::reproducir, modifier = Modifier.wulfFocoInicial()) { … }
+ * ```
+ *
+ * Tiene que ir **antes** del `focusable`/`clickable` en la cadena de
+ * modificadores, que es donde lo pone este ayudante por su cuenta al
+ * encadenarse: el requester tiene que envolver al nodo que recibe el foco, no
+ * ir después.
+ *
+ * @param activo en falso no pide nada. Sirve para que la pantalla decida en
+ *   caliente cuál de sus piezas arranca enfocada —la lista si hay elementos, el
+ *   mensaje de vacío si no— sin mover los modificadores de sitio.
+ */
+@Composable
+fun Modifier.wulfFocoInicial(activo: Boolean = true): Modifier {
+    val solicitante = remember { FocusRequester() }
+
+    LaunchedEffect(activo) {
+        if (activo) {
+            // `runCatching`: si el elemento se fue del árbol entre que se pidió
+            // y que llegó el efecto, pedir el foco lanza. Un arranque de
+            // pantalla no puede reventar por eso.
+            runCatching { solicitante.requestFocus() }
+        }
+    }
+
+    return focusRequester(solicitante)
+}

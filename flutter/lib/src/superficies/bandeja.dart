@@ -60,6 +60,7 @@ class WulfPozo extends StatefulWidget {
     this.onLongPress,
     this.seleccionado = false,
     this.enfocable = true,
+    this.autofoco = false,
     this.padding = const EdgeInsets.all(WulfSpacing.paddingCelda),
     this.radio = WulfRadius.pozo,
   });
@@ -77,6 +78,13 @@ class WulfPozo extends StatefulWidget {
   /// Seleccion actual: la cresta pasa al metal pleno y engorda. El acento
   /// nunca se usa decorativamente, solo para esto y para accion primaria.
   final bool seleccionado;
+
+  /// Si toma el foco al aparecer la pantalla.
+  ///
+  /// Uno por pantalla: dos piezas peleandose el foco inicial dejan el resultado
+  /// al azar del orden del arbol. Ver [WulfFocoInicial] para lo que no es un
+  /// pozo.
+  final bool autofoco;
 
   /// Si entra en el recorrido del mando y del teclado.
   ///
@@ -122,6 +130,7 @@ class _WulfPozoState extends State<WulfPozo> {
           onLongPress: widget.onLongPress,
           borderRadius: borde,
           canRequestFocus: widget.enfocable,
+          autofocus: widget.autofoco,
           onFocusChange: (tiene) => setState(() => _enfocado = tiene),
           // El resaltado de foco de fabrica es un rectangulo translucido, que
           // es exactamente la senal que este sistema no usa. Lo apaga: el foco

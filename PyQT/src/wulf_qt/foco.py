@@ -16,10 +16,13 @@ Acá queda lo que hay que calcular.
 
 from __future__ import annotations
 
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QWidget
+
 from .tema import mezclar
 from .tokens import SEPARACION_FOCO, Canto, Modo
 
-__all__ = ["Canto", "SEPARACION_FOCO", "tono_enfocado"]
+__all__ = ["Canto", "SEPARACION_FOCO", "foco_inicial", "tono_enfocado"]
 
 
 def tono_enfocado(pozo: str, modo: Modo) -> str:
@@ -31,3 +34,23 @@ def tono_enfocado(pozo: str, modo: Modo) -> str:
     """
     hacia = "#FFFFFF" if modo is Modo.OSCURO else "#000000"
     return mezclar(pozo, hacia, SEPARACION_FOCO)
+
+
+def foco_inicial(widget: QWidget) -> None:
+    """Le da el foco a [widget] cuando la ventana aparece.
+
+    **Una pantalla sin foco inicial deja al teclado sin punto de partida**: la
+    primera pulsación se gasta en que Qt elija por su cuenta, y elige el primero
+    del orden de tabulación, que casi nunca es lo que se quiere hacer.
+
+    Es una línea al final de armar la pantalla:
+
+    ```python
+    foco_inicial(self.barra)
+    ```
+
+    Se aplaza al siguiente ciclo de eventos a propósito: pedido durante la
+    construcción, el widget todavía no está en una ventana y Qt lo descarta sin
+    decir nada — el fallo se ve como "a veces funciona".
+    """
+    QTimer.singleShot(0, widget.setFocus)

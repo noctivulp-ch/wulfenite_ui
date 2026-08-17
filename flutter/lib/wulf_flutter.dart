@@ -37,6 +37,7 @@
 library;
 
 export 'src/componentes/aviso.dart';
+export 'src/componentes/barra.dart';
 export 'src/componentes/dialogo.dart';
 export 'src/componentes/enlace.dart';
 export 'src/componentes/falla.dart';

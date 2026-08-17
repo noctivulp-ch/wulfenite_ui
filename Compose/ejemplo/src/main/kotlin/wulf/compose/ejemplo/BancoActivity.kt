@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import wulf.compose.componentes.WulfAcciones
 import wulf.compose.componentes.WulfAvisoHost
+import wulf.compose.componentes.WulfBarraBusqueda
+import wulf.compose.componentes.WulfBarraProgreso
 import wulf.compose.componentes.WulfBoton
 import wulf.compose.componentes.WulfBotonPlano
 import wulf.compose.componentes.WulfBotonPrimario
@@ -40,6 +42,7 @@ import wulf.compose.tokens.WulfAcento
 import wulf.compose.tokens.WulfEfectoPesado
 import wulf.compose.tokens.WulfEfectos
 import wulf.compose.tokens.WulfSpacing
+import wulf.compose.foco.wulfFocoInicial
 import wulf.compose.tokens.WulfTheme
 
 /**
@@ -86,12 +89,45 @@ fun Banco() {
                         onModo = { oscuro = !oscuro },
                         onRelieve = { relieve = !relieve },
                     )
+                    Reproductor()
                     Reticula()
                     Tallado()
                     Controles()
                     Acciones()
                 }
             }
+        }
+    }
+}
+
+/**
+ * La barra de búsqueda, que es la pieza central de un reproductor.
+ *
+ * Es lo primero que recibe el foco al abrir: en un televisor, la pantalla tiene
+ * que decir de entrada qué se puede hacer. Con el mando enfocada, izquierda y
+ * derecha mueven la posición.
+ */
+@Composable
+private fun Reproductor() {
+    var posicion by remember { mutableStateOf(0.35f) }
+
+    WulfPozo(Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(WulfSpacing.unidad)) {
+            Text("Reproductor", style = MaterialTheme.typography.titleLarge)
+            WulfBarraBusqueda(
+                valor = posicion,
+                onCambio = { posicion = it },
+                // Lo cargado va por delante de la posición: es lo que distingue
+                // "va por el minuto 3" de "tiene hasta el 8 en memoria".
+                secundario = (posicion + 0.2f).coerceAtMost(1f),
+                modifier = Modifier.wulfFocoInicial(),
+            )
+            Text(
+                "${(posicion * 100).toInt()} %",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text("Progreso (no se enfoca)", style = MaterialTheme.typography.bodySmall)
+            WulfBarraProgreso(valor = 0.7f)
         }
     }
 }

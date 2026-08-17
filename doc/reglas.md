@@ -212,6 +212,15 @@ mando.
 Sin esto una app **no se puede usar en un televisor**. No es una mejora de
 accesibilidad: el mando mueve el foco y nada en pantalla dice dónde está.
 
+Dos consecuencias que se olvidan, y que cada paquete resuelve en una línea:
+
+- **Solo se enfoca lo que se puede activar.** Una barra de progreso no entra en
+  el recorrido; una de búsqueda sí. Un destino del mando en el que no hay nada
+  que hacer convierte el recorrido en un laberinto.
+- **Cada pantalla dice cuál es su punto de partida.** Sin foco inicial, la
+  primera pulsación se gasta en que el sistema elija por su cuenta — y elige lo
+  primero del árbol, que casi nunca es lo que se quiere hacer.
+
 ---
 
 ## Contraste verificado

@@ -26,14 +26,14 @@ otro motivo y Flutter no está sobre la mesa.
 | `superficies/` | Bandeja y pozo — la geometría invertida, la cresta de 1 dp, la onda del toque |
 | `reticula/` | Las seis columnas y los tres tamaños |
 | `texto/` | El relieve grabado y la etiqueta que encoge |
-| `componentes/` | Diálogo, acciones, panel, enlace, falla, aviso y controles |
+| `componentes/` | Diálogo, acciones, panel, enlace, falla, aviso, controles y barras |
 | `foco/` | Los tres escalones del canto — lo que hace usable la app con mando |
 | `ejemplo/` | El banco de estilo: una app que toca todas las piezas |
 
 ## Correrlo
 
 ```bash
-./gradlew :wulf-compose:testDebugUnitTest   # 40 pruebas, sin emulador
+./gradlew :wulf-compose:testDebugUnitTest   # 46 pruebas, sin emulador
 ./gradlew :ejemplo:installDebug             # el banco de estilo en un aparato
 ```
 
@@ -52,6 +52,11 @@ tocable es enfocable por defecto; `enfocable = false` lo saca del recorrido.
 
 No es una mejora de accesibilidad: **sin esto la app no se puede usar con un
 mando**. El mando mueve el foco y nada en pantalla dice dónde está.
+
+Para un reproductor hacen falta dos cosas más, y están: `WulfBarraBusqueda`
+—izquierda y derecha mueven la posición, arriba y abajo salen de la barra— y
+`Modifier.wulfFocoInicial()`, que dice cuál es el punto de partida de la
+pantalla.
 
 Se comprobó recorriendo el banco de estilo con el D-pad. Ahí salió un fallo que
 no se veía leyendo el código: el enlace enfocado se marcaba con el recuadro gris
@@ -112,7 +117,7 @@ Flutter, donde hubo que anular el velo blanco de fábrica botón por botón.
 
 ## Estado
 
-**0.1.0, sin publicar.** Compila, pasa sus 40 pruebas y el banco de estilo corre
+**0.1.0, sin publicar.** Compila, pasa sus 46 pruebas y el banco de estilo corre
 —y se recorre con el D-pad— en un aparato real. La API puede moverse mientras no haya un segundo proyecto
 usándola.
 

@@ -22,7 +22,7 @@ wulfenite_ui/
 |---|---|---|---|
 | Paquete | `wulf_flutter` | `wulf_qt` | `wulf-compose` |
 | Cómo se aplica | `buildWulfTheme(WulfAcento.oro)` | `aplicar(app, Acento.ORO, Modo.OSCURO)` | `WulfTheme(WulfAcento.ORO) { }` |
-| Pruebas | 80 | 77 | 40 |
+| Pruebas | 93 | 90 | 46 |
 | Ejemplo | `example/` | `ejemplo/banco.py` | `ejemplo/` |
 
 Comparten prefijo de paquete (`wulf`) para que convivan sin chocar, y comparten
@@ -134,6 +134,8 @@ necesitar la pieza:
 | Tokens, retícula, tallado, diálogo, enlace, etiqueta | ✓ | ✓ | ✓ |
 | Aviso | ✓ | ✓ | ✓ |
 | Foco / D-pad (regla 12) | ✓ | ✓ | ✓ |
+| Barras (progreso y búsqueda) | ✓ | ✓ | ✓ |
+| Foco inicial de pantalla | ✓ | ✓ | ✓ |
 | Falla | ✓ | — | ✓ |
 | Velo superior | ✓ | — | ✓ |
 | Onda del toque | ✓ | — | ✓ |
