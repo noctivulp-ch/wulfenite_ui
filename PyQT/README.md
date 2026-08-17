@@ -68,7 +68,7 @@ manía: en la app de la que salió esto, el orden estaba invertido en los once
 diálogos, y en el de "crear categoría al vuelo" eso significa **pulsar Cancelar
 creyendo guardar**. Lo encontró el dueño usándola, no una revisión de código.
 
-Las doce reglas completas, con el porqué de cada una, están en el paquete Dart:
+Las trece reglas completas, con el porqué de cada una, están en el paquete Dart:
 [`doc/reglas.md`](../doc/reglas.md).
 
 ## Probar

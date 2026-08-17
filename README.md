@@ -10,7 +10,7 @@ canto de un píxel que es lo único que carga la profundidad.
 
 ```
 wulfenite_ui/
-├── doc/reglas.md   ← las doce reglas. Lo único que de verdad define el sistema
+├── doc/reglas.md   ← las trece reglas. Lo único que de verdad define el sistema
 ├── flutter/        ← paquete Dart · wulf_flutter
 ├── PyQT/           ← paquete Python · wulf_qt
 └── Compose/        ← paquete Kotlin · wulf-compose (Android nativo)
@@ -22,7 +22,7 @@ wulfenite_ui/
 |---|---|---|---|
 | Paquete | `wulf_flutter` | `wulf_qt` | `wulf-compose` |
 | Cómo se aplica | `buildWulfTheme(WulfAcento.oro)` | `aplicar(app, Acento.ORO, Modo.OSCURO)` | `WulfTheme(WulfAcento.ORO) { }` |
-| Pruebas | 93 | 90 | 46 |
+| Pruebas | 97 | 90 | 46 |
 | Ejemplo | `example/` | `ejemplo/banco.py` | `ejemplo/` |
 
 Comparten prefijo de paquete (`wulf`) para que convivan sin chocar, y comparten
@@ -83,7 +83,7 @@ Cada una tiene su README con el detalle: [`flutter/`](flutter/README.md) ·
 
 ## Lo que hace que se vea así no son los colores
 
-Son las [doce reglas](doc/reglas.md) y las pruebas que las vigilan. Los tokens
+Son las [trece reglas](doc/reglas.md) y las pruebas que las vigilan. Los tokens
 sin las reglas dan otra app cualquiera con una paleta bonita.
 
 Tres ejemplos de regla que está **dentro del componente**, no en una guía que

@@ -27,7 +27,7 @@ bandeja.show()
 app.exec()
 ```
 
-Las doce reglas, con el porqué de cada una, están en `../doc/reglas.md`.
+Las trece reglas, con el porqué de cada una, están en `../doc/reglas.md`.
 """
 
 from .componentes import (
@@ -46,6 +46,7 @@ from .foco import Canto, foco_inicial, tono_enfocado
 from .tema import ATENUADO, BANDEJA, POZO, aplicar, hoja_de_estilo, paleta
 from .texto import FUSION, PROFUNDIDAD, EtiquetaAjustada, Tallado, color_tallado
 from .tokens import (
+    RIM_TELEVISION,
     SEPARACION_FOCO,
     APAGADO_RIBETE,
     GAP_CELDA,
@@ -75,7 +76,7 @@ __all__ = [
     "APAGADO_RIBETE", "ATENUADO", "BANDEJA", "COLUMNAS", "FUSION", "GAP_CELDA",
     "GAP_GRUPO", "LACAS", "METALES", "OBJETIVO_TACTIL_MIN", "PADDING_CELDA",
     "PADDING_CELDA_GRANDE", "PARED", "POZO", "PROFUNDIDAD", "RADIO_BANDEJA",
-    "RADIO_POZO", "RIM", "SOBRE_METAL", "UNIDAD",
+    "RADIO_POZO", "RIM", "RIM_TELEVISION", "SOBRE_METAL", "UNIDAD",
     "ALTO_BARRA", "PASO_BUSQUEDA", "Acciones", "Acento", "Ancho", "Atenuado", "Aviso",
     "BarraBusqueda", "Bandeja", "Canto", "Celda",
     "Cuadricula",

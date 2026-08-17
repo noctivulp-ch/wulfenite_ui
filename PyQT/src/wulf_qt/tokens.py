@@ -238,3 +238,12 @@ class Canto:
 #: la onda del toque de las gemelas: el aparato dice "acá estás" con el mismo
 #: material se llegue con el dedo, con el mando o con el teclado.
 SEPARACION_FOCO = 0.10
+
+
+#: El labio de la bandeja en un televisor, que es el doble.
+#:
+#: Existe por paridad con las gemelas y **no se usa en escritorio**: el overscan
+#: es cosa de televisores, y un monitor no recorta la imagen. Está acá para que
+#: los tres paquetes digan los mismos números y para el día en que alguien monte
+#: una interfaz Qt en una tele.
+RIM_TELEVISION = UNIDAD * 6

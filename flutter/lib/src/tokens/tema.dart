@@ -57,6 +57,19 @@ class WulfSpacing {
   /// Borde exterior de la bandeja. Mas grueso que la pared interior, como el
   /// labio de una bandeja real.
   static const double rim = unidad * 3; // 24
+
+  /// El labio en un televisor, que es el doble.
+  ///
+  /// No es estetica: un televisor recorta los bordes de la imagen (overscan), y
+  /// la guia de Android TV pide dejar libre un 5% por lado. Con el labio normal
+  /// de 24, a 1080p quedan 48 px de 1920 — la MITAD de lo que hace falta, medido
+  /// en el emulador. Lo que se pierde ahi es justo la cresta de los pozos de los
+  /// extremos, que es la senal primaria de profundidad (regla 1).
+  ///
+  /// A diferencia de la gemela de Compose, aca hay que pedirlo: Flutter no
+  /// expone el `uiMode` de Android, asi que quien sabe que corre en un televisor
+  /// es la app. `WulfBandeja(television: true)`.
+  static const double rimTelevision = unidad * 6; // 48
 }
 
 /// Los dos únicos radios del sistema.

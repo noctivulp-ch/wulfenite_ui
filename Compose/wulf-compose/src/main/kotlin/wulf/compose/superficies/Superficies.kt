@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import android.content.res.Configuration
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -35,6 +36,19 @@ import wulf.compose.tokens.WulfRadius
 import wulf.compose.tokens.WulfSpacing
 import wulf.compose.tokens.WulfTheme
 import wulf.compose.tokens.wulfObjetivoTactilMin
+
+/**
+ * Si la app corre en un televisor, según lo que dice Android.
+ *
+ * Se pregunta al sistema en vez de deducirlo del tamaño de pantalla: un monitor
+ * de 1920 y un televisor de 1920 se miran a distancias muy distintas, y solo el
+ * sistema sabe cuál es cuál.
+ */
+@Composable
+@androidx.compose.runtime.ReadOnlyComposable
+fun wulfEsTelevision(): Boolean =
+    (androidx.compose.ui.platform.LocalConfiguration.current.uiMode and
+        Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION
 
 /**
  * El plano de la bandeja: un único contenedor continuo por pantalla, con el
@@ -57,6 +71,9 @@ fun WulfBandeja(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val laca = WulfTheme.laca
+    // En televisor el labio es el doble: la pantalla recorta los bordes y con el
+    // labio normal se come la cresta de los pozos de los extremos.
+    val labio = if (wulfEsTelevision()) WulfSpacing.rimTelevision else WulfSpacing.rim
     // El texto que cae sobre la bandeja toma su color, no el del pozo. Sin
     // proveerlo acá, un `Text` suelto hereda el negro por defecto de Compose y
     // desaparece sobre la bandeja oscura — que es exactamente lo que pasó la
@@ -68,7 +85,7 @@ fun WulfBandeja(
         Box(
             modifier = modifier
                 .then(if (fondo) Modifier.background(laca.bandeja) else Modifier)
-                .then(if (rim) Modifier.padding(WulfSpacing.rim) else Modifier),
+                .then(if (rim) Modifier.padding(labio) else Modifier),
             content = content,
         )
     }

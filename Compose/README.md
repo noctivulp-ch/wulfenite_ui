@@ -2,7 +2,7 @@
 
 Wulfenite para **Android nativo**, en Kotlin con Jetpack Compose. Gemela de
 [`flutter/`](../flutter/README.md) y de [`PyQT/`](../PyQT/README.md): los mismos
-hexadecimales, el mismo espaciado, las mismas [doce reglas](../doc/reglas.md).
+hexadecimales, el mismo espaciado, las mismas [trece reglas](../doc/reglas.md).
 
 ```kotlin
 WulfTheme(WulfAcento.JADE) {

@@ -1,6 +1,6 @@
 # Las reglas
 
-Lo que hace que esto se vea así **no son los colores**: son estas doce reglas y
+Lo que hace que esto se vea así **no son los colores**: son estas trece reglas y
 las pruebas que las vigilan. Los tokens sin las reglas dan otra app cualquiera
 con una paleta bonita.
 
@@ -220,6 +220,22 @@ Dos consecuencias que se olvidan, y que cada paquete resuelve en una línea:
 - **Cada pantalla dice cuál es su punto de partida.** Sin foco inicial, la
   primera pulsación se gasta en que el sistema elija por su cuenta — y elige lo
   primero del árbol, que casi nunca es lo que se quiere hacer.
+
+### 13. En un televisor el labio es el doble
+
+Un televisor **recorta los bordes de la imagen** (overscan), y lo que se pierde
+ahí es justo la cresta de los pozos de los extremos — la señal primaria de la
+regla 1. La guía de Android TV pide dejar libre un 5 % por lado.
+
+Medido en el emulador de Android TV a 1080p: con el labio normal de 24 quedaban
+48 px de 1920, **la mitad** de lo que hace falta. Por eso hay un token aparte de
+48, que da los 96 px exactos.
+
+Quién lo elige depende de la plataforma, y eso también es la regla: **se le
+pregunta al sistema, no se deduce del tamaño de pantalla.** Un monitor de 1920 y
+un televisor de 1920 se miran a distancias muy distintas, y solo el sistema sabe
+cuál es cuál. Donde el sistema lo dice —Android— la bandeja lo resuelve sola;
+donde no lo expone —Flutter— lo declara la app.
 
 ---
 

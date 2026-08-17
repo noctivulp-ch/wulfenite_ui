@@ -38,6 +38,19 @@ object WulfSpacing {
      * labio de una bandeja real.
      */
     val rim: Dp = 24.dp
+
+    /**
+     * El labio en un televisor, que es el doble.
+     *
+     * No es estética: un televisor recorta los bordes de la imagen (overscan), y
+     * la guía de Android TV pide dejar libre un 5 % por lado. Con el labio normal
+     * de 24 dp, a 1080p quedan 48 px de 1920 — la **mitad** de lo que hace falta,
+     * medido en el emulador. Lo que se pierde ahí es justo la cresta de los pozos
+     * de los extremos, que es la señal primaria de profundidad (regla 1).
+     *
+     * `WulfBandeja` lo elige solo cuando Android dice que está en un televisor.
+     */
+    val rimTelevision: Dp = 48.dp
 }
 
 /**

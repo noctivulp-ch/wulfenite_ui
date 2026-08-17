@@ -13,7 +13,12 @@ import '../tokens/tema.dart';
 /// cuando la bandeja esta anidada dentro de otra superficie.
 class WulfBandeja extends StatelessWidget {
   /// Envuelve [child] en el labio de la bandeja.
-  const WulfBandeja({super.key, required this.child, this.rim = true});
+  const WulfBandeja({
+    super.key,
+    required this.child,
+    this.rim = true,
+    this.television = false,
+  });
 
   /// Lo que va dentro de la bandeja, normalmente una retícula de pozos.
   final Widget child;
@@ -22,10 +27,15 @@ class WulfBandeja extends StatelessWidget {
   /// padre ya lo puso y esta es una subdivision interna.
   final bool rim;
 
+  /// En un televisor el labio es el doble, por el overscan. Hay que decirlo:
+  /// Flutter no expone el `uiMode` de Android, asi que la app es la que sabe.
+  final bool television;
+
   @override
   Widget build(BuildContext context) {
     if (!rim) return child;
-    return Padding(padding: const EdgeInsets.all(WulfSpacing.rim), child: child);
+    final labio = television ? WulfSpacing.rimTelevision : WulfSpacing.rim;
+    return Padding(padding: EdgeInsets.all(labio), child: child);
   }
 }
 
