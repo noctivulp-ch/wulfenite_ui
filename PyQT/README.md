@@ -138,8 +138,14 @@ tabs = quitar_linea_de_pestanas(QTabWidget())
 tabs.setTabPosition(QTabWidget.TabPosition.West)
 ```
 
-Lo que Qt sigue haciendo por su cuenta y hay que saber: en `West` **rota el
-texto**. Si no se quiere, hace falta un estilo delegado — Wulfenite no lo trae.
+**El texto sigue rotado, y no tiene arreglo con el tema puesto.** La única vía es
+un estilo delegado, y Qt lo descarta en cuanto una hoja de estilo toca
+`QTabBar::tab` — medido: 75×29 sin hoja, 51×67 con ella.
+
+`enderezar_texto_de_pestanas(tabs)` existe y **devuelve si lo consiguió**, para
+que nadie lo dé por hecho. Con el tema puesto devuelve `False`. Las salidas están
+en [`doc/paridad.md`](../doc/paridad.md); la corta es **usar un rail** —una
+columna de `boton_plano`— en vez de pestañas verticales.
 
 ## Estado
 

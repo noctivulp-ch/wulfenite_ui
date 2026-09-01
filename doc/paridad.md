@@ -118,9 +118,37 @@ TabRow(
 ) { … }
 ```
 
-**Verticales:** en Qt van con `setTabPosition`. En Flutter y en Compose no hay
-pestañas verticales de fábrica — lo que se usa es un **rail de navegación**, que
-es otra pieza y otra conversación.
+### Pestañas verticales, y el texto rotado
+
+En Qt van con `setTabPosition`, y la marca del activo ya cae en el borde que toca
+al panel. **Lo que no se puede arreglar es que Qt rote el texto 90°.**
+
+Se intentó con un `QProxyStyle`, que es la única vía. Funciona… hasta que se
+aplica el tema:
+
+| | tamaño de la pestaña | estilo del widget |
+|---|---|---|
+| sin hoja de estilo | **75×29** — texto horizontal | el proxy |
+| con la hoja de Wulfenite | 51×67 — texto rotado | el de Qt |
+
+**En cuanto una hoja de estilo toca `QTabBar::tab`, Qt sustituye el estilo del
+widget por el suyo y descarta el proxy.** El orden no cambia nada. Y como
+Wulfenite sí estiliza las pestañas, el proxy siempre se pierde.
+
+`enderezar_texto_de_pestanas` existe igual y **devuelve si lo consiguió**, para
+que nadie se quede creyendo que está arreglado. Con el tema puesto devuelve
+`False`.
+
+Las tres salidas, en orden de preferencia:
+
+1. **Pestañas arriba**, que es lo que hace Wulfenite por defecto.
+2. **Un rail de navegación**: una columna de `boton_plano` sobre la bandeja. Se
+   lee de frente, entra en el recorrido del teclado y no depende de ningún estilo
+   delegado. Es lo que usan Flutter y Compose, donde no hay pestañas verticales
+   de fábrica.
+3. **Renunciar al estilo de esa barra**, si de verdad hacen falta verticales y
+   legibles. Se pierde el acabado del sistema ahí, que casi siempre es peor
+   negocio.
 
 ### Controles — tres caminos y el mismo resultado
 

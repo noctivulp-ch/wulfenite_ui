@@ -103,3 +103,60 @@ class TestPestanasVerticales:
         from wulf_qt import Canto
 
         assert f"{Canto.SELECCIONADO}px" in self._bloque("QTabBar::tab:left:selected")
+
+
+class TestTextoDeLasPestanasVerticales:
+    """Qt rota el texto 90° en pestañas verticales, y no siempre se puede evitar.
+
+    Lo que estas pruebas fijan es **la honestidad del ayudante**: que devuelva si
+    lo consiguió, y que no diga que sí cuando no. Un ayudante que falla en
+    silencio deja el texto rotado y a quien lo llamó creyendo que está arreglado.
+    """
+
+    def _pestanas_verticales(self):
+        from PySide6.QtWidgets import QTabWidget, QWidget
+
+        tabs = QTabWidget()
+        tabs.setTabPosition(QTabWidget.TabPosition.West)
+        for nombre in ("Reportes", "Config"):
+            tabs.addTab(QWidget(), nombre)
+        return tabs
+
+    def test_sin_hoja_de_estilo_lo_consigue_y_la_pestaña_se_ensancha(self, app):
+        from wulf_qt import enderezar_texto_de_pestanas
+
+        anterior = app.styleSheet()
+        app.setStyleSheet("")
+        try:
+            tabs = self._pestanas_verticales()
+            assert enderezar_texto_de_pestanas(tabs) is True
+
+            tabs.ensurePolished()
+            caja = tabs.tabBar().tabRect(0)
+            # Ancha en vez de alta: es la firma del texto horizontal. Sin
+            # transponer, el texto horizontal no cabría.
+            assert caja.width() > caja.height(), f"salió {caja.width()}x{caja.height()}"
+        finally:
+            app.setStyleSheet(anterior)
+
+    def test_con_la_hoja_de_wulfenite_avisa_de_que_NO_pudo(self, app):
+        # Qt sustituye el estilo del widget por el suyo en cuanto una hoja toca
+        # QTabBar::tab, y descarta el proxy. Medido: 75x29 sin hoja, 51x67 con
+        # ella. Lo que no puede pasar es que devuelva True y el texto salga
+        # rotado igual.
+        from wulf_qt import Acento, Modo, enderezar_texto_de_pestanas, hoja_de_estilo
+
+        anterior = app.styleSheet()
+        app.setStyleSheet(hoja_de_estilo(Acento.ORO, Modo.OSCURO))
+        try:
+            tabs = self._pestanas_verticales()
+            assert enderezar_texto_de_pestanas(tabs) is False
+        finally:
+            app.setStyleSheet(anterior)
+
+    def test_con_algo_que_no_tiene_barra_devuelve_falso_sin_reventar(self, app):
+        from PySide6.QtWidgets import QLabel
+
+        from wulf_qt import enderezar_texto_de_pestanas
+
+        assert enderezar_texto_de_pestanas(QLabel()) is False

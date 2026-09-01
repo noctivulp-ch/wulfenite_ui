@@ -13,6 +13,10 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QDialog,
+    QProxyStyle,
+    QStyle,
+    QStyleOptionTab,
+    QTabBar,
     QDialogButtonBox,
     QHBoxLayout,
     QLabel,
@@ -320,3 +324,100 @@ class Falla(QWidget):
         visible = self.detalle.isHidden()
         self.detalle.setVisible(visible)
         self._abrir.setText("Ocultar detalle técnico" if visible else "Detalle técnico")
+
+
+class _EstiloDePestanasDerechas(QProxyStyle):
+    """Dibuja el texto de las pestañas en horizontal aunque estén de lado.
+
+    Qt rota el texto 90° cuando las pestañas van a la izquierda o a la derecha, y
+    no hay forma de pedirle que no lo haga desde la hoja de estilo. Se arregla en
+    dos sitios y hacen falta los dos:
+
+    - **el tamaño**, o la pestaña queda alta y estrecha —con la forma del texto
+      rotado— y el texto horizontal no cabe;
+    - **el dibujo de la etiqueta**, diciéndole a Qt que la pinte como si la
+      pestaña estuviera arriba.
+
+    Es privado: se usa a través de [enderezar_texto_de_pestanas].
+    """
+
+    def sizeFromContents(self, tipo, opcion, tamano, widget):  # noqa: N802 (API de Qt)
+        medido = super().sizeFromContents(tipo, opcion, tamano, widget)
+        # Solo si viene más alto que ancho: es la firma de una pestaña de lado, y
+        # así una pestaña normal no se toca.
+        if tipo == QStyle.ContentsType.CT_TabBarTab and medido.width() < medido.height():
+            medido.transpose()
+        return medido
+
+    def drawControl(self, elemento, opcion, pintor, widget):  # noqa: N802 (API de Qt)
+        if elemento == QStyle.ControlElement.CE_TabBarTabLabel:
+            derecha = QStyleOptionTab(opcion)
+            # Mentirle a Qt sobre la posición SOLO para la etiqueta: el resto de
+            # la pestaña se sigue dibujando en su sitio, con su borde y su marca.
+            derecha.shape = QTabBar.Shape.RoundedNorth
+            super().drawControl(elemento, derecha, pintor, widget)
+            return
+        super().drawControl(elemento, opcion, pintor, widget)
+
+
+def enderezar_texto_de_pestanas(pestanas: QWidget) -> bool:
+    """Intenta dejar el texto horizontal en unas pestañas verticales.
+
+    Qt las rota 90°, y leer de lado es incómodo. Esto transpone el tamaño de la
+    pestaña y le dice a Qt que pinte la etiqueta como si estuviera arriba.
+
+    **Devuelve si lo consiguió, y muchas veces será `False`.** No es un capricho
+    de la API: hay una limitación de Qt que no se puede sortear desde aquí.
+
+    ## La limitación, medida
+
+    Un `QProxyStyle` es la única forma de enderezar ese texto. Pero **en cuanto una
+    hoja de estilo toca `QTabBar::tab`, Qt sustituye el estilo del widget por el
+    suyo propio y descarta el proxy.** Comprobado:
+
+    | | tamaño de la pestaña | estilo del widget |
+    |---|---|---|
+    | sin hoja de estilo | **75x29** — texto horizontal | el proxy |
+    | con la hoja de Wulfenite | 51x67 — texto rotado | `QCommonStyle` |
+
+    Y el orden da igual: aplicarlo antes o después de mostrar la ventana lleva al
+    mismo sitio.
+
+    Como Wulfenite **sí** estiliza las pestañas —color del texto, marca del
+    activo, aire— el proxy se pierde en cuanto se aplica el tema. Por eso esto
+    avisa en vez de fallar en silencio: quien lo llame y vea `False` sabe que el
+    texto va a salir rotado y puede decidir.
+
+    ## Qué hacer entonces
+
+    - **Pestañas arriba.** Es lo que hace Wulfenite por defecto y no tiene este
+      problema.
+    - **Un rail de navegación**: una columna de botones en vez de pestañas
+      verticales. Se arma con `boton_plano` y el pozo, se lee de frente y entra en
+      el recorrido del teclado como cualquier otro control.
+    - **Renunciar al estilo de las pestañas** para esa ventana, si de verdad hace
+      falta que sean verticales y legibles. Se pierde el acabado del sistema en
+      esa barra, que es peor negocio casi siempre.
+
+    ```python
+    if not enderezar_texto_de_pestanas(tabs):
+        ...  # el texto va a salir rotado
+    ```
+    """
+    barra = pestanas.tabBar() if hasattr(pestanas, "tabBar") else pestanas
+    # Tiene que ser una barra de pestañas de verdad. `setStyle` no sirve de
+    # guarda: lo tienen TODOS los widgets, así que colocarle este estilo a una
+    # etiqueta habría devuelto `True` tan contento.
+    if not isinstance(barra, QTabBar):
+        return False
+
+    estilo = _EstiloDePestanasDerechas()
+    # El estilo se cuelga del widget para que viva lo mismo que él: sin la
+    # referencia, Python lo recoge y Qt se queda apuntando a nada.
+    barra._wulf_estilo = estilo
+    barra.setStyle(estilo)
+
+    # Se comprueba que haya quedado puesto. Si una hoja de estilo toca las
+    # pestañas, Qt lo reemplaza por el suyo y esto devuelve `False` — que es
+    # exactamente lo que hay que saber.
+    return isinstance(barra.style(), _EstiloDePestanasDerechas)
