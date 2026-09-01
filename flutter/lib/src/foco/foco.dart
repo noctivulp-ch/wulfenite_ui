@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../reticula/cuadricula.dart';
+
 /// Grosor del canto según el estado. Es la regla 12 en forma de número.
 ///
 /// El foco NO estrena una señal propia: usa la que el sistema ya tiene para
@@ -31,6 +33,16 @@ class WulfCanto {
   /// en la mano se distingue perfectamente, ahí no existe. Es el mismo motivo
   /// por el que el objetivo táctil es de 48 y no de 32.
   static const double enfocado = 3;
+
+  /// En un televisor engorda otro escalon.
+  ///
+  /// A tres metros lo que en la mano se distingue perfectamente deja de verse, y
+  /// el foco es lo unico que dice donde esta uno navegando con mando.
+  static const double enfocadoTelevision = 4;
+
+  /// El canto de foco que le toca a un tamano.
+  static double enfocadoDe(WulfAncho ancho) =>
+      ancho.esLejano ? enfocadoTelevision : enfocado;
 }
 
 /// Cuánto se aclara el pozo enfocado, en la misma escala que el tono del toque.

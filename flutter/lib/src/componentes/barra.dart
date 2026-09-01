@@ -13,7 +13,7 @@ const double wulfAltoBarra = 8;
 /// Cinco por ciento y no uno: con el 1% recorrer una pelicula de dos horas
 /// serian cien pulsaciones. Con el 5%, veinte — y el ajuste fino sale de
 /// mantener pulsado, que el sistema repite solo.
-const double wulfPasoBusqueda = 0.05;
+const double wulfPasoDeslizador = 0.05;
 
 /// Una barra de progreso: cuanto va de algo que avanza solo.
 ///
@@ -21,8 +21,8 @@ const double wulfPasoBusqueda = 0.05;
 /// destino del mando en el que no se puede actuar convierte el recorrido en un
 /// laberinto (regla 12).
 ///
-/// Para lo que SI se controla —buscar en un video, mover un volumen— esta
-/// [WulfBarraBusqueda].
+/// Para lo que SI se mueve —la posicion de un video, un volumen— esta
+/// [WulfDeslizador].
 class WulfBarraProgreso extends StatelessWidget {
   /// Una barra que solo informa.
   const WulfBarraProgreso({super.key, required this.valor, this.secundario});
@@ -55,24 +55,24 @@ class WulfBarraProgreso extends StatelessWidget {
   }
 }
 
-/// Una barra que se controla: buscar en un video, mover un volumen.
+/// Una barra que se MUEVE: la posicion de un video, un volumen.
 ///
 /// Es la pieza central de un reproductor, y por eso lo importante aca es que
 /// **funcione con el mando**: izquierda y derecha mueven de a [paso], y el foco
 /// se ve con el canto del sistema (regla 12). Sin esto, en un televisor no hay
-/// forma de buscar.
+/// forma de mover la posicion.
 ///
 /// El objetivo tactil es de 48 aunque el carril mida 8: se dibuja fino y se toca
 /// ancho, que es lo que permite acertarle con el dedo sin engordar la pieza.
-class WulfBarraBusqueda extends StatefulWidget {
+class WulfDeslizador extends StatefulWidget {
   /// Una barra que se puede mover.
-  const WulfBarraBusqueda({
+  const WulfDeslizador({
     super.key,
     required this.valor,
     required this.onCambio,
     this.secundario,
     this.habilitado = true,
-    this.paso = wulfPasoBusqueda,
+    this.paso = wulfPasoDeslizador,
     this.autofoco = false,
   });
 
@@ -96,10 +96,10 @@ class WulfBarraBusqueda extends StatefulWidget {
   final bool autofoco;
 
   @override
-  State<WulfBarraBusqueda> createState() => _WulfBarraBusquedaState();
+  State<WulfDeslizador> createState() => _WulfDeslizadorState();
 }
 
-class _WulfBarraBusquedaState extends State<WulfBarraBusqueda> {
+class _WulfDeslizadorState extends State<WulfDeslizador> {
   bool _enfocado = false;
 
   double get _valor => widget.valor.clamp(0.0, 1.0);

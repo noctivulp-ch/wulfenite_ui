@@ -2,9 +2,9 @@
 
 La distinción no es cosmética. Una barra de progreso **no se puede enfocar**
 —no hay nada que hacer con ella, y un destino del teclado en el que no se puede
-actuar convierte el recorrido en un laberinto (regla 12)—. Una barra de búsqueda
-sí, porque es la pieza central de un reproductor: sin ella no se puede buscar sin
-ratón.
+actuar convierte el recorrido en un laberinto (regla 12)—. Un deslizador
+sí, porque es la pieza central de un reproductor: sin él no se puede mover la
+posición sin ratón.
 
 Qt ya mueve un `QSlider` con las flechas, así que acá lo que hace falta es la
 forma —un pozo alargado— y que el foco se vea.
@@ -26,7 +26,7 @@ ALTO_BARRA = 8
 #: Cinco por ciento y no uno: con el 1% recorrer una película de dos horas serían
 #: cien pulsaciones. Con el 5%, veinte — y el ajuste fino sale de mantener
 #: pulsado, que el sistema repite solo.
-PASO_BUSQUEDA = 0.05
+PASO_DESLIZADOR = 0.05
 
 #: La escala interna del deslizador. Se trabaja en enteros porque `QSlider` no
 #: admite decimales; la API de fuera habla de 0 a 1 como las gemelas.
@@ -47,8 +47,8 @@ def barra_progreso(parent: QWidget | None = None) -> QProgressBar:
     return b
 
 
-class BarraBusqueda(QSlider):
-    """Una barra que se controla: buscar en un vídeo, mover un volumen.
+class Deslizador(QSlider):
+    """Una barra que se MUEVE: la posición de un vídeo, un volumen.
 
     Habla de 0 a 1 por fuera —igual que las gemelas— y por dentro usa enteros,
     que es lo único que `QSlider` entiende.
@@ -63,8 +63,8 @@ class BarraBusqueda(QSlider):
         self.setFixedHeight(OBJETIVO_TACTIL_MIN)
         # Las flechas mueven un paso; RePág/AvPág, diez. Qt lo hace solo con
         # estos dos números, así que no hay que atender teclas a mano.
-        self.setSingleStep(int(PASO_BUSQUEDA * _ESCALA))
-        self.setPageStep(int(PASO_BUSQUEDA * _ESCALA) * 2)
+        self.setSingleStep(int(PASO_DESLIZADOR * _ESCALA))
+        self.setPageStep(int(PASO_DESLIZADOR * _ESCALA) * 2)
         # Fuerte y no `TabFocus`: tiene que alcanzarse también con las flechas
         # del mando, no solo con el tabulador.
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
@@ -118,7 +118,7 @@ QSlider[class="wulf-barra"]::handle:horizontal {{
     margin: -{radio}px 0;
 }}
 /* Sin esto se pulsa Tab, el foco cae en la barra y nada lo dice — que en un
-   reproductor significa no poder buscar sin ratón. */
+   reproductor significa no poder mover la posición sin ratón. */
 QSlider[class="wulf-barra"]:focus::groove:horizontal {{
     background-color: {carril_enfocado};
     border: {Canto.ENFOCADO}px solid {metal};

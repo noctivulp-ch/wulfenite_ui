@@ -20,7 +20,7 @@ void main() {
     bool habilitado = true,
     bool autofoco = true,
   }) => conTema(
-    WulfBarraBusqueda(
+    WulfDeslizador(
       valor: valor,
       onCambio: onCambio,
       habilitado: habilitado,
@@ -37,7 +37,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pump();
 
-      expect(nuevo, closeTo(0.5 + wulfPasoBusqueda, 0.0001));
+      expect(nuevo, closeTo(0.5 + wulfPasoDeslizador, 0.0001));
     });
 
     testWidgets('la izquierda retrocede un paso', (tester) async {
@@ -48,7 +48,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await tester.pump();
 
-      expect(nuevo, closeTo(0.5 - wulfPasoBusqueda, 0.0001));
+      expect(nuevo, closeTo(0.5 - wulfPasoDeslizador, 0.0001));
     });
 
     testWidgets('no se puede buscar más allá del final', (tester) async {
@@ -108,7 +108,7 @@ void main() {
     test('recorrer la barra entera cuesta un número razonable de pulsaciones', () {
       // Con el 1% serían cien: recorrer una película de dos horas dejaría de ser
       // viable con el mando. El ajuste fino sale de mantener pulsado.
-      final pulsaciones = (1 / wulfPasoBusqueda).round();
+      final pulsaciones = (1 / wulfPasoDeslizador).round();
       expect(pulsaciones, inInclusiveRange(10, 25));
     });
   });
@@ -119,7 +119,7 @@ void main() {
       // engordar la pieza (regla 7).
       await tester.pumpWidget(barra(onCambio: (_) {}, autofoco: false));
 
-      final caja = tester.getSize(find.byType(WulfBarraBusqueda));
+      final caja = tester.getSize(find.byType(WulfDeslizador));
       expect(caja.height, wulfObjetivoTactilMin);
       expect(wulfAltoBarra, lessThan(wulfObjetivoTactilMin));
     });

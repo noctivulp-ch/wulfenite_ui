@@ -13,9 +13,9 @@ from PySide6.QtWidgets import QWidget
 from wulf_qt import (
     ALTO_BARRA,
     OBJETIVO_TACTIL_MIN,
-    PASO_BUSQUEDA,
+    PASO_DESLIZADOR,
     Acento,
-    BarraBusqueda,
+    Deslizador,
     Canto,
     Modo,
     barra_progreso,
@@ -30,14 +30,14 @@ class TestQuienSeEnfoca:
         # un laberinto (regla 12).
         assert barra_progreso().focusPolicy() == Qt.FocusPolicy.NoFocus
 
-    def test_la_de_busqueda_se_alcanza_con_flechas_y_no_solo_con_tabulador(self, app):
+    def test_el_deslizador_se_alcanza_con_flechas_y_no_solo_con_tabulador(self, app):
         # `StrongFocus` y no `TabFocus`: en un mando no hay tabulador.
-        assert BarraBusqueda().focusPolicy() == Qt.FocusPolicy.StrongFocus
+        assert Deslizador().focusPolicy() == Qt.FocusPolicy.StrongFocus
 
 
 class TestBuscarConElTeclado:
     def test_un_paso_mueve_lo_que_dice_el_token(self, app):
-        barra = BarraBusqueda()
+        barra = Deslizador()
         barra.poner_valor(0.5)
         barra.setValue(barra.value() + barra.singleStep())
 
@@ -46,13 +46,13 @@ class TestBuscarConElTeclado:
     def test_no_se_puede_buscar_mas_alla_del_final(self, app):
         # Sin el recorte, mantener pulsada la derecha manda la posición fuera
         # del archivo y el reproductor salta a un sitio que no existe.
-        barra = BarraBusqueda()
+        barra = Deslizador()
         barra.poner_valor(3.7)
 
         assert barra.valor() == 1.0
 
     def test_no_se_puede_buscar_antes_del_principio(self, app):
-        barra = BarraBusqueda()
+        barra = Deslizador()
         barra.poner_valor(-2.0)
 
         assert barra.valor() == 0.0
@@ -60,11 +60,11 @@ class TestBuscarConElTeclado:
     def test_recorrer_la_barra_cuesta_un_numero_razonable_de_pulsaciones(self, app):
         # Con el 1% serían cien: recorrer una película de dos horas dejaría de
         # ser viable. El ajuste fino sale de mantener pulsado.
-        pulsaciones = round(1 / PASO_BUSQUEDA)
+        pulsaciones = round(1 / PASO_DESLIZADOR)
         assert 10 <= pulsaciones <= 25
 
     def test_avanzar_pagina_mueve_mas_que_una_flecha(self, app):
-        barra = BarraBusqueda()
+        barra = Deslizador()
         assert barra.pageStep() > barra.singleStep()
 
 
@@ -73,7 +73,7 @@ class TestComoSeVe:
         # El carril mide 8 y el objetivo táctil 48: se acierta con el dedo sin
         # engordar la pieza (regla 7).
         assert ALTO_BARRA < OBJETIVO_TACTIL_MIN
-        assert BarraBusqueda().height() == OBJETIVO_TACTIL_MIN
+        assert Deslizador().height() == OBJETIVO_TACTIL_MIN
         assert barra_progreso().height() == ALTO_BARRA
 
     def test_el_foco_engorda_el_canto(self, app):
@@ -102,8 +102,8 @@ class TestFocoInicial:
         # Sin foco inicial la primera pulsación se gasta en que Qt elija por su
         # cuenta, y elige el primero del orden de tabulación.
         ventana = QWidget()
-        primero = BarraBusqueda(ventana)
-        elegido = BarraBusqueda(ventana)
+        primero = Deslizador(ventana)
+        elegido = Deslizador(ventana)
         ventana.show()
 
         foco_inicial(elegido)
@@ -120,7 +120,7 @@ class TestFocoInicial:
         # ventana y Qt lo descarta sin decir nada: el fallo se ve como "a veces
         # funciona".
         ventana = QWidget()
-        barra = BarraBusqueda(ventana)
+        barra = Deslizador(ventana)
         ventana.show()
 
         foco_inicial(barra)

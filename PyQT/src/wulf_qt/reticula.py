@@ -25,7 +25,7 @@ COLUMNAS = 6
 
 
 class Ancho(Enum):
-    """El tamaño de la ventana, en tres tramos."""
+    """El tamaño de la ventana. Tres salen del ancho; el cuarto, no."""
 
     COMPACTO = "compacto"
     """Menos de 600 px: teléfono, o un panel lateral estrecho."""
@@ -36,14 +36,37 @@ class Ancho(Enum):
     AMPLIO = "amplio"
     """1024 o más: escritorio."""
 
+    TELEVISION = "television"
+    """Televisor: se mira de lejos y se maneja con mando.
+
+    **No sale del ancho, sale de la plataforma.** Un televisor de 1080p reporta
+    unos 960 px lógicos y por ancho caería en `MEDIO`, que es el reparto de una
+    tablet que se mira a cuarenta centímetros. A tres metros esa composición no
+    se lee: hacen falta menos piezas, más grandes, y un canto de foco más grueso.
+
+    En escritorio casi nunca aplica. Está por paridad con las gemelas y para el
+    día en que alguien monte una interfaz Qt en una tele — que es exactamente lo
+    que pasa con los reproductores de salón.
+    """
+
+    @property
+    def es_lejano(self) -> bool:
+        """Si se mira de lejos."""
+        return self is Ancho.TELEVISION
+
     @staticmethod
-    def de(ancho: int) -> "Ancho":
+    def de(ancho: int, television: bool = False) -> "Ancho":
         """El tramo que le toca a un ancho en píxeles.
 
         Se decide a partir de un ancho y no de la ventana a propósito: un panel
         lateral estrecho dentro de un escritorio ancho tiene que componerse como
         compacto, o queda ilegible.
+
+        `television` gana sobre el ancho, porque la distancia de lectura no se
+        puede medir en píxeles.
         """
+        if television:
+            return Ancho.TELEVISION
         if ancho >= 1024:
             return Ancho.AMPLIO
         if ancho >= 600:

@@ -27,7 +27,7 @@ bandeja.show()
 app.exec()
 ```
 
-Las trece reglas, con el porqué de cada una, están en `../doc/reglas.md`.
+Las catorce reglas, con el porqué de cada una, están en `../doc/reglas.md`.
 """
 
 from .componentes import (
@@ -41,12 +41,14 @@ from .componentes import (
 )
 from .reticula import COLUMNAS, Ancho, Bandeja, Celda, Cuadricula, Pozo
 from .aviso import Aviso, mostrar_aviso
-from .barra import ALTO_BARRA, PASO_BUSQUEDA, BarraBusqueda, barra_progreso
+from .barra import ALTO_BARRA, PASO_DESLIZADOR, Deslizador, barra_progreso
 from .foco import Canto, foco_inicial, tono_enfocado
 from .tema import ATENUADO, BANDEJA, POZO, aplicar, hoja_de_estilo, paleta
 from .texto import FUSION, PROFUNDIDAD, EtiquetaAjustada, Tallado, color_tallado
 from .tokens import (
     RIM_TELEVISION,
+    canto_enfocado_de,
+    rim_de,
     SEPARACION_FOCO,
     APAGADO_RIBETE,
     GAP_CELDA,
@@ -77,11 +79,11 @@ __all__ = [
     "GAP_GRUPO", "LACAS", "METALES", "OBJETIVO_TACTIL_MIN", "PADDING_CELDA",
     "PADDING_CELDA_GRANDE", "PARED", "POZO", "PROFUNDIDAD", "RADIO_BANDEJA",
     "RADIO_POZO", "RIM", "RIM_TELEVISION", "SOBRE_METAL", "UNIDAD",
-    "ALTO_BARRA", "PASO_BUSQUEDA", "Acciones", "Acento", "Ancho", "Atenuado", "Aviso",
-    "BarraBusqueda", "Bandeja", "Canto", "Celda",
+    "ALTO_BARRA", "PASO_DESLIZADOR", "Acciones", "Acento", "Ancho", "Atenuado", "Aviso",
+    "Deslizador", "Bandeja", "Canto", "Celda",
     "Cuadricula",
     "Dialogo", "Enlace", "EtiquetaAjustada", "Laca", "Modo", "Pozo", "Tallado",
     "SEPARACION_FOCO", "aplicar", "boton", "boton_plano", "boton_primario",
-    "barra_progreso", "canto_del_pozo", "foco_inicial", "mostrar_aviso", "tono_enfocado",
+    "barra_progreso", "canto_del_pozo", "canto_enfocado_de", "rim_de", "foco_inicial", "mostrar_aviso", "tono_enfocado",
     "color_tallado", "contraste", "hoja_de_estilo", "mezclar", "paleta",
 ]

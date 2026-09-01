@@ -233,11 +233,26 @@ class Canto:
     #: táctil es de 48 y no de 32.
     ENFOCADO = 3
 
+    #: En un televisor engorda otro escalón. A tres metros lo que en la mano se
+    #: distingue perfectamente deja de verse, y el foco es lo único que dice
+    #: dónde está uno navegando con mando.
+    ENFOCADO_TELEVISION = 4
+
 
 #: Cuánto se aclara el pozo enfocado. Coincide a propósito con la separación de
 #: la onda del toque de las gemelas: el aparato dice "acá estás" con el mismo
 #: material se llegue con el dedo, con el mando o con el teclado.
 SEPARACION_FOCO = 0.10
+
+
+def rim_de(ancho) -> int:
+    """El labio que le toca a un tamaño: el doble en televisor, por el overscan."""
+    return RIM_TELEVISION if ancho.es_lejano else RIM
+
+
+def canto_enfocado_de(ancho) -> int:
+    """El canto de foco que le toca a un tamaño."""
+    return Canto.ENFOCADO_TELEVISION if ancho.es_lejano else Canto.ENFOCADO
 
 
 #: El labio de la bandeja en un televisor, que es el doble.

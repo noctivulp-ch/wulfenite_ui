@@ -20,13 +20,28 @@ enum WulfAncho {
   medio,
 
   /// Escritorio.
-  amplio;
+  amplio,
+
+  /// Televisor: se mira de lejos y se maneja con mando.
+  ///
+  /// **No sale del ancho, sale de la plataforma.** Un televisor de 1080p reporta
+  /// unos 960 dp lógicos —medido en el emulador de Android TV— y por ancho caería
+  /// en [medio], que es el reparto de una tablet que se mira a cuarenta
+  /// centímetros. A tres metros esa composición no se lee.
+  ///
+  /// Flutter no expone el `uiMode` de Android, así que quien sabe que corre en un
+  /// televisor es la app: se declara con [de].
+  television;
 
   static const double _corteMedio = 600;
   static const double _corteAmplio = 1024;
 
   /// El tamaño que le toca a la ventana actual.
-  static WulfAncho de(BuildContext context) => deAncho(MediaQuery.sizeOf(context).width);
+  ///
+  /// [television] gana sobre el ancho, porque la distancia de lectura no se
+  /// puede medir en pixeles. Hay que decirlo: Flutter no expone ese dato.
+  static WulfAncho de(BuildContext context, {bool television = false}) =>
+      television ? WulfAncho.television : deAncho(MediaQuery.sizeOf(context).width);
 
   /// Separado de [de] para poder decidir a partir del ancho de una caja y no
   /// del de la ventana: un panel lateral angosto dentro de un escritorio ancho
@@ -39,6 +54,11 @@ enum WulfAncho {
 
   /// Atajo para el caso que más se consulta: si hay que componer para teléfono.
   bool get esCompacto => this == WulfAncho.compacto;
+
+  /// Si se mira de lejos. Lo que cambia no es el ancho sino el tamaño de todo:
+  /// el labio de la bandeja, el canto del foco y cuántas piezas caben antes de
+  /// que deje de leerse.
+  bool get esLejano => this == WulfAncho.television;
 }
 
 /// Cuántas columnas tiene la retícula. Es el mismo número en los tres tamaños:
@@ -58,11 +78,20 @@ const int wulfColumnas = 6;
 /// con un `GridView` de `crossAxisCount` EXPLÍCITO, y este helper es el que hace
 /// que ese número salga del mismo vocabulario de spans que el resto de la app en
 /// vez de ser un `maxCrossAxisExtent` que reparte por ancho disponible.
-int wulfPorFila(WulfAncho ancho, {required int compacto, required int medio, required int amplio}) {
+int wulfPorFila(
+  WulfAncho ancho, {
+  required int compacto,
+  required int medio,
+  required int amplio,
+  int? television,
+}) {
   final span = switch (ancho) {
     WulfAncho.compacto => compacto,
     WulfAncho.medio => medio,
     WulfAncho.amplio => amplio,
+    // Por defecto hereda el de escritorio, que es lo razonable de partida — pero
+    // se puede pedir otro: de lejos suelen caber menos piezas por fila, no mas.
+    WulfAncho.television => television ?? amplio,
   };
   return wulfColumnas ~/ span;
 }
@@ -79,6 +108,7 @@ class WulfCelda {
     required this.compacto,
     required this.medio,
     required this.amplio,
+    this.television,
     required this.hijo,
   }) : assert(compacto >= 1 && compacto <= wulfColumnas),
        assert(medio >= 1 && medio <= wulfColumnas),
@@ -97,6 +127,9 @@ class WulfCelda {
   /// Columnas que ocupa en escritorio.
   final int amplio;
 
+  /// Columnas en televisor. Nulo hereda el de escritorio.
+  final int? television;
+
   /// El contenido de la celda.
   final Widget hijo;
 
@@ -105,6 +138,7 @@ class WulfCelda {
     WulfAncho.compacto => compacto,
     WulfAncho.medio => medio,
     WulfAncho.amplio => amplio,
+    WulfAncho.television => television ?? amplio,
   };
 }
 

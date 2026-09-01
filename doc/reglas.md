@@ -1,6 +1,6 @@
 # Las reglas
 
-Lo que hace que esto se vea así **no son los colores**: son estas trece reglas y
+Lo que hace que esto se vea así **no son los colores**: son estas catorce reglas y
 las pruebas que las vigilan. Los tokens sin las reglas dan otra app cualquiera
 con una paleta bonita.
 
@@ -236,6 +236,27 @@ pregunta al sistema, no se deduce del tamaño de pantalla.** Un monitor de 1920 
 un televisor de 1920 se miran a distancias muy distintas, y solo el sistema sabe
 cuál es cuál. Donde el sistema lo dice —Android— la bandeja lo resuelve sola;
 donde no lo expone —Flutter— lo declara la app.
+
+### 14. Un nombre dice lo que la pieza hace
+
+La barra que se mueve se llamó **`BarraBusqueda`** durante un tiempo, y un agente
+que usó la librería la tomó por un buscador de texto. Es lo que dice el nombre en
+castellano: buscar es buscar algo, no desplazarse por un vídeo.
+
+Se llama **deslizador**, que es el par estándar y sin ambigüedad:
+
+| pieza | qué hace | se enfoca |
+|---|---|---|
+| barra de progreso | informa de algo que avanza solo | **no** |
+| deslizador | se mueve: posición, volumen | **sí** |
+
+La regla general: **el nombre describe el comportamiento, no la escena donde se
+usó primero.** Un deslizador sirve para el volumen igual que para un vídeo;
+llamarlo "de búsqueda" lo ataba a un caso y describía otro.
+
+Vale también al revés: `pozo`, `bandeja` y `cresta` son metáforas y se quedan,
+porque **son** el vocabulario del sistema y están definidas en la regla 1. Lo que
+no puede pasar es que un nombre corriente signifique otra cosa corriente.
 
 ---
 
