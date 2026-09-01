@@ -29,6 +29,7 @@ Este documento se actualiza **en el mismo commit** que añade o quita algo.
 | Velo superior | ✓ | **no aplica** | ✓ |
 | Onda del toque | ✓ | **por el sistema** | ✓ |
 | Pestañas | **a mano** | ✓ | **a mano** |
+| Rail de navegación | ✓ | ✓ | ✓ |
 
 ---
 
@@ -142,10 +143,10 @@ que nadie se quede creyendo que está arreglado. Con el tema puesto devuelve
 Las tres salidas, en orden de preferencia:
 
 1. **Pestañas arriba**, que es lo que hace Wulfenite por defecto.
-2. **Un rail de navegación**: una columna de `boton_plano` sobre la bandeja. Se
-   lee de frente, entra en el recorrido del teclado y no depende de ningún estilo
-   delegado. Es lo que usan Flutter y Compose, donde no hay pestañas verticales
-   de fábrica.
+2. **El rail** (`Rail` en Qt, `WulfRail` en las otras dos). Es la pieza que el
+   sistema trae para esto: se lee de frente, entra en el recorrido del teclado y
+   no depende de ningún estilo delegado. **Es la recomendación**, y está en los
+   tres paquetes.
 3. **Renunciar al estilo de esa barra**, si de verdad hacen falta verticales y
    legibles. Se pierde el acabado del sistema ahí, que casi siempre es peor
    negocio.

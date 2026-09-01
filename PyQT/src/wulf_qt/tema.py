@@ -122,9 +122,13 @@ def hoja_de_estilo(acento: Acento, modo: Modo) -> str:
 
     from .aviso import qss_del_aviso
     from .barra import qss_de_las_barras
+    from .componentes import qss_del_rail
 
     return qss_del_aviso(laca.pozo, metal, laca.texto_en_pozo) + qss_de_las_barras(
         laca.pozo, pozo_enfocado, metal, canto
+    ) + qss_del_rail(
+        laca.bandeja, laca.texto_en_bandeja, laca.texto_atenuado_en_bandeja,
+        metal, pozo_enfocado,
     ) + f"""
 /* ── La bandeja: un plano continuo, sin nada flotando encima ─────────────── */
 QMainWindow, QDialog {{

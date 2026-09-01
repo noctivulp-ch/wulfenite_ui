@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (
 )
 
 from .tema import ATENUADO, POZO
-from .tokens import GAP_CELDA, OBJETIVO_TACTIL_MIN, PADDING_CELDA, PARED, UNIDAD
+from .tokens import Canto, GAP_CELDA, OBJETIVO_TACTIL_MIN, PADDING_CELDA, PARED, UNIDAD
 
 
 def boton_primario(texto: str, parent: QWidget | None = None) -> QPushButton:
@@ -421,3 +421,113 @@ def enderezar_texto_de_pestanas(pestanas: QWidget) -> bool:
     # pestañas, Qt lo reemplaza por el suyo y esto devuelve `False` — que es
     # exactamente lo que hay que saber.
     return isinstance(barra.style(), _EstiloDePestanasDerechas)
+
+
+class Rail(QWidget):
+    """La columna de navegación: los destinos de la app, en vertical.
+
+    **Es la respuesta del sistema a la navegación lateral**, y existe en vez de
+    unas pestañas verticales por un motivo concreto: Qt **rota el texto** en unas
+    pestañas de lado, y con el tema puesto eso **no tiene arreglo** — descarta el
+    estilo delegado en cuanto una hoja de estilo toca `QTabBar::tab`. Acá el texto
+    va horizontal siempre, sin depender de ningún estilo delegado.
+
+    Reglas de la pieza:
+
+    - **Vive en la bandeja, no en un pozo.** Es cromo, no contenido. El pozo es lo
+      que hay al lado.
+    - **La marca del activo va en el borde que toca al contenido** — el derecho —,
+      con el metal y el grosor de selección. Misma regla que en las pestañas: la
+      marca señala hacia lo que se está mirando.
+    - **Cada destino entra en el recorrido del teclado** y muestra el foco como
+      todo lo demás.
+    - **48 de alto mínimo.**
+
+    ```python
+    rail = Rail(["Venta", "Catálogo", "Reportes"], al_elegir=self.ir_a)
+    rail.seleccionar(0)
+    ```
+    """
+
+    def __init__(
+        self,
+        destinos: list[str],
+        *,
+        al_elegir=None,
+        ancho: int = 88,
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setProperty("class", "wulf-rail")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setFixedWidth(ancho)
+
+        self._al_elegir = al_elegir
+        self._botones: list[QPushButton] = []
+        self._activo = -1
+
+        caja = QVBoxLayout(self)
+        caja.setContentsMargins(0, UNIDAD, 0, UNIDAD)
+        caja.setSpacing(UNIDAD // 2)
+
+        for indice, etiqueta in enumerate(destinos):
+            b = QPushButton(etiqueta, self)
+            b.setProperty("class", "wulf-rail-destino")
+            b.setMinimumHeight(OBJETIVO_TACTIL_MIN)
+            b.setCheckable(True)
+            # `StrongFocus` y no el de un botón normal: un rail se recorre con las
+            # flechas de un mando, donde no hay tabulador.
+            b.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+            b.clicked.connect(lambda _=False, i=indice: self.seleccionar(i))
+            caja.addWidget(b)
+            self._botones.append(b)
+
+        caja.addStretch(1)
+        if destinos:
+            self.seleccionar(0, avisar=False)
+
+    def seleccionar(self, indice: int, *, avisar: bool = True) -> None:
+        """Marca un destino como activo. Fuera de rango no hace nada."""
+        if not 0 <= indice < len(self._botones):
+            return
+        self._activo = indice
+        for i, b in enumerate(self._botones):
+            b.setChecked(i == indice)
+            # Se repinta a mano: cambiar una propiedad no invalida el estilo por
+            # su cuenta, y el destino se quedaba con la marca del anterior.
+            b.style().unpolish(b)
+            b.style().polish(b)
+        if avisar and self._al_elegir is not None:
+            self._al_elegir(indice)
+
+    @property
+    def activo(self) -> int:
+        """El índice del destino marcado."""
+        return self._activo
+
+
+def qss_del_rail(bandeja: str, texto: str, atenuado: str, metal: str, enfocado: str) -> str:
+    """El QSS del rail. Lo concatena `hoja_de_estilo`."""
+    return f"""
+QWidget[class="wulf-rail"] {{ background-color: {bandeja}; }}
+
+/* Sin caja y sin fondo propio: un destino no es un pozo, es cromo sobre la
+   bandeja. El pozo es lo que hay al lado. */
+QPushButton[class="wulf-rail-destino"] {{
+    background: transparent;
+    color: {atenuado};
+    border: none;
+    padding: {UNIDAD}px;
+    text-align: center;
+}}
+/* La marca en el borde DERECHO, que es el que toca al contenido. */
+QPushButton[class="wulf-rail-destino"]:checked {{
+    color: {texto};
+    border-right: {Canto.SELECCIONADO}px solid {metal};
+}}
+QPushButton[class="wulf-rail-destino"]:focus {{
+    color: {texto};
+    background-color: {enfocado};
+    border-right: {Canto.ENFOCADO}px solid {metal};
+}}
+"""

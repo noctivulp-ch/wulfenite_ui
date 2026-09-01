@@ -138,6 +138,9 @@ Tres ejemplos de lo que ese documento resuelve:
   porque la de fábrica es blanca y rompe la laca.
 - **Las pestañas son pieza solo en Qt**, porque solo ahí hay un problema que
   resolver. Para las otras dos está la receta, con el código.
+- **Para navegación vertical está el rail**, en los tres. Existe porque unas
+  pestañas de lado rotan el texto — y en Qt eso no tiene arreglo con el tema
+  puesto.
 
 ## De dónde salió
 
