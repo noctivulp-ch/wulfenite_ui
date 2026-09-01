@@ -31,6 +31,7 @@ Las catorce reglas, con el porqué de cada una, están en `../doc/reglas.md`.
 """
 
 from .componentes import (
+    Falla,
     quitar_linea_de_pestanas,
     Acciones,
     Atenuado,
@@ -82,7 +83,7 @@ __all__ = [
     "RADIO_POZO", "RIM", "RIM_TELEVISION", "SOBRE_METAL", "UNIDAD",
     "ALTO_BARRA", "PASO_DESLIZADOR", "Acciones", "Acento", "Ancho", "Atenuado", "Aviso",
     "Deslizador", "Bandeja", "Canto", "Celda",
-    "Cuadricula",
+    "Cuadricula", "Falla",
     "Dialogo", "Enlace", "EtiquetaAjustada", "Laca", "Modo", "Pozo", "Tallado",
     "SEPARACION_FOCO", "aplicar", "boton", "boton_plano", "boton_primario",
     "barra_progreso", "canto_del_pozo", "quitar_linea_de_pestanas", "canto_enfocado_de", "rim_de", "foco_inicial", "mostrar_aviso", "tono_enfocado",

@@ -119,23 +119,25 @@ alguien tiene que recordar:
 Las tres salieron de fallos vistos usando una app de verdad, no de una revisión
 de código.
 
-## Qué viaja entre las dos, y qué no
+## Paridad
 
-**Viaja entero:** los tokens, la retícula, el reparto de acciones, el piso de
-contraste, los controles, el aviso y los tres escalones del foco.
+**Una pieza está en los tres, o está escrito por qué no y cómo se consigue lo
+mismo a mano** — con la receta concreta. Está todo en
+[`doc/paridad.md`](doc/paridad.md), y se actualiza en el mismo commit que añade o
+quita algo.
 
-**Viaja a medias:** el relieve. En Flutter son tres capas de widget; en Qt, tres
-pasadas de `QPainter`; en Compose, otra vez tres capas. Funciona en las tres y
-está probado, pero es la pieza donde las implementaciones son de verdad distintas
-— una hoja de estilo no sabe decir "pintá este mismo glifo tres veces
-desplazado".
+Un hueco sin explicar es peor que no tener la pieza: quien lo encuentre
+improvisa, y ahí es donde se pierde la identidad.
 
-**Viaja, pero hay que escribirlo:** la mezcla de colores. Cada plataforma
-interpola en un espacio distinto por su cuenta, así que las tres llevan su propia
-mezcla canal a canal en sRGB. Delegar en la de la plataforma es lo que rompió el
-contraste del port de Kotlin.
+Tres ejemplos de lo que ese documento resuelve:
 
-**No viaja:** iconos y cualquier widget que sepa de un dominio concreto.
+- **El velo superior no está en Qt** y no es un olvido: una ventana de escritorio
+  no tiene muesca de cámara. Está escrito qué hacer el día que haga falta.
+- **La onda del toque tampoco**, porque el estilo de Qt ya marca la pulsación
+  como el sistema quiere. En Flutter y en Compose hay que reemplazarla entera
+  porque la de fábrica es blanca y rompe la laca.
+- **Las pestañas son pieza solo en Qt**, porque solo ahí hay un problema que
+  resolver. Para las otras dos está la receta, con el código.
 
 ## De dónde salió
 
@@ -144,27 +146,6 @@ llevaba meses probado en teléfonos reales antes de mudarse acá. Esa app **no
 depende de esto**: desde su versión 1.0.0 cada cambio ahí es una actualización
 sobre datos de un negocio, y una refactorización estética no justifica ese
 riesgo. Estas librerías son para los proyectos que vienen.
-
-## Qué falta para que las tres digan lo mismo
-
-La paridad no está cerrada, y conviene tenerlo escrito en vez de descubrirlo al
-necesitar la pieza:
-
-| pieza | Flutter | PyQT | Compose |
-|---|---|---|---|
-| Tokens, retícula, tallado, diálogo, enlace, etiqueta | ✓ | ✓ | ✓ |
-| Aviso | ✓ | ✓ | ✓ |
-| Foco / D-pad (regla 12) | ✓ | ✓ | ✓ |
-| Cuarto tamaño: televisor | ✓ | ✓ | ✓ |
-| Barras (progreso y búsqueda) | ✓ | ✓ | ✓ |
-| Foco inicial de pantalla | ✓ | ✓ | ✓ |
-| Falla | ✓ | — | ✓ |
-| Velo superior | ✓ | — | ✓ |
-| Onda del toque | ✓ | — | ✓ |
-
-Las tres que le faltan a PyQT son de escritorio, donde pesan menos: no hay
-muesca de cámara que esquivar con un velo, y Qt ya trae su propia realimentación
-al pulsar. Aun así son huecos, no decisiones.
 
 ## Estado
 

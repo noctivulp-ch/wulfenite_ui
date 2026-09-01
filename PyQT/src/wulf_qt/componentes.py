@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from .tema import ATENUADO
+from .tema import ATENUADO, POZO
 from .tokens import GAP_CELDA, OBJETIVO_TACTIL_MIN, PADDING_CELDA, PARED, UNIDAD
 
 
@@ -236,3 +236,87 @@ def quitar_linea_de_pestanas(pestanas: QWidget) -> QWidget:
     if hasattr(barra, "setDrawBase"):
         barra.setDrawBase(False)
     return pestanas
+
+
+class Falla(QWidget):
+    """Qué se muestra cuando algo no se pudo cargar.
+
+    Nace de un caso real: una pantalla de reportes falló en un aparato y lo que
+    apareció fue una excepción de base de datos con la consulta entera, a pantalla
+    llena, delante de quien atendía el mostrador. El error estaba capturado — pero
+    **capturar no es lo mismo que contar**.
+
+    Dos audiencias, y por eso dos niveles:
+
+    - quien usa la app lee una frase en su idioma y un botón para reintentar;
+    - quien la desarrolla ve el detalle técnico, pero **solo si se le pide**,
+      porque en el mostrador no le sirve a nadie y encima puede filtrar nombres de
+      tablas.
+
+    Lo que **no** hace es tragarse el error: el fallo se sigue viendo, y sigue
+    siendo evidente que algo está mal. Un cero silencioso dejaría al negocio
+    creyendo que no vendió nada.
+
+    ```python
+    Falla("No se pudieron cargar las ventas", al_reintentar=self.recargar)
+    ```
+
+    `mostrar_detalle` viene en falso a propósito: la librería no puede saber si
+    esto corre en depuración. La app lo decide.
+    """
+
+    def __init__(
+        self,
+        mensaje: str,
+        *,
+        error: object | None = None,
+        al_reintentar=None,
+        mostrar_detalle: bool = False,
+        texto_reintentar: str = "Reintentar",
+        parent: QWidget | None = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setProperty("class", POZO)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
+        caja = QVBoxLayout(self)
+        caja.setContentsMargins(PADDING_CELDA, PADDING_CELDA, PADDING_CELDA, PADDING_CELDA)
+        caja.setSpacing(UNIDAD)
+
+        self.mensaje = QLabel(mensaje, self)
+        self.mensaje.setWordWrap(True)
+        caja.addWidget(self.mensaje)
+
+        # Nulo esconde el botón: sin nada que reintentar, ofrecerlo es prometer
+        # algo que no pasa.
+        self.boton = None
+        if al_reintentar is not None:
+            self.boton = boton_primario(texto_reintentar, self)
+            self.boton.clicked.connect(al_reintentar)
+            fila = QHBoxLayout()
+            fila.addWidget(self.boton)
+            fila.addStretch(1)
+            caja.addLayout(fila)
+
+        # Plegado: el detalle es para depurar, no para mirar de frente.
+        self.detalle = None
+        if mostrar_detalle and error is not None:
+            self._abrir = boton_plano("Detalle técnico", self)
+            self.detalle = QLabel(str(error), self)
+            self.detalle.setWordWrap(True)
+            self.detalle.setTextInteractionFlags(
+                Qt.TextInteractionFlag.TextSelectableByMouse
+            )
+            self.detalle.hide()
+            self._abrir.clicked.connect(self._alternar_detalle)
+            caja.addWidget(self._abrir)
+            caja.addWidget(self.detalle)
+
+    def _alternar_detalle(self) -> None:
+        # `isHidden` y no `isVisible`: mientras la ventana no se haya mostrado,
+        # `isVisible` es falso aunque el detalle esté desplegado, y el alternador
+        # se quedaba encendido para siempre. `isHidden` es el estado explícito y
+        # no depende de que el padre esté en pantalla.
+        visible = self.detalle.isHidden()
+        self.detalle.setVisible(visible)
+        self._abrir.setText("Ocultar detalle técnico" if visible else "Detalle técnico")
