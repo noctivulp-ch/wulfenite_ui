@@ -306,10 +306,18 @@ QTabBar::tab {{
     padding: {UNIDAD}px {PADDING_CELDA}px;
     border: none;
 }}
+/* La marca del activo va en el borde que TOCA AL PANEL, y ese borde cambia con
+   la posición de las pestañas. Con una sola regla de `border-bottom`, unas
+   pestañas verticales quedaban subrayadas por abajo —la marca cruzada respecto
+   del panel— y se veía mal sin que nada fallara. Comprobado midiendo píxeles:
+   arriba el indicador sale de 56x2, y a la izquierda de 2x40. */
 QTabBar::tab:selected {{
     color: {laca.texto_en_bandeja};
-    border-bottom: 2px solid {metal};
 }}
+QTabBar::tab:top:selected    {{ border-bottom: {Canto.SELECCIONADO}px solid {metal}; }}
+QTabBar::tab:bottom:selected {{ border-top:    {Canto.SELECCIONADO}px solid {metal}; }}
+QTabBar::tab:left:selected   {{ border-right:  {Canto.SELECCIONADO}px solid {metal}; }}
+QTabBar::tab:right:selected  {{ border-left:   {Canto.SELECCIONADO}px solid {metal}; }}
 QTabWidget::pane {{ border: none; }}
 
 /* ── Tooltips ────────────────────────────────────────────────────────────── */

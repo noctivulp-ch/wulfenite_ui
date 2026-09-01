@@ -124,6 +124,23 @@ PySide6 6.11.1: una `QTabBar()` suelta viene con la línea encendida y la de un
 Lo que **no** hace es decidir cómo se ven las pestañas. Eso sería una pieza
 completa, y media pieza sería la única del sistema que no define su acabado.
 
+### Verticales
+
+Funcionan. La marca del activo va en el borde que **toca al panel**, y ese borde
+cambia con la posición — arriba marca abajo, a la izquierda marca a la derecha.
+
+Con una sola regla de subrayado no funcionaban: unas pestañas a la izquierda
+quedaban subrayadas por abajo, o sea con la marca **cruzada** respecto del panel.
+Medido pintando: el indicador salía de **56×2** y ahora sale de **2×40**.
+
+```python
+tabs = quitar_linea_de_pestanas(QTabWidget())
+tabs.setTabPosition(QTabWidget.TabPosition.West)
+```
+
+Lo que Qt sigue haciendo por su cuenta y hay que saber: en `West` **rota el
+texto**. Si no se quiere, hace falta un estilo delegado — Wulfenite no lo trae.
+
 ## Estado
 
 **0.1.0, sin publicar.** La paridad de tokens está verificada y las reglas están

@@ -83,6 +83,14 @@ WulfTheme(WulfAcento.ORO) {
 Cada una tiene su README con el detalle: [`flutter/`](flutter/README.md) ·
 [`PyQT/`](PyQT/README.md) · [`Kotlin/`](Kotlin/README.md).
 
+## Capas, medidas y parpadeos
+
+Lo que **no falla**: no lanza excepción, no rompe una prueba, no sale en una
+revisión de código. Solo se ve mal. El orden de las capas de un pozo, las medidas
+que no se pueden calcular, los colores que aparecen de la nada y los parpadeos —
+todo con el caso real que lo destapó — están en
+[`doc/capas-y-medidas.md`](doc/capas-y-medidas.md).
+
 ## Rendimiento
 
 El relieve pinta el mismo glifo tres veces, y eso se paga. Cuánto cuesta, dónde

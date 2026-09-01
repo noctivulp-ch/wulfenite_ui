@@ -54,3 +54,52 @@ def test_la_hoja_de_estilo_no_puede_arreglarlo(app):
     qss = hoja_de_estilo(Acento.ORO, Modo.OSCURO)
 
     assert "drawBase" not in qss, "drawBase no es una propiedad de QSS"
+
+
+class TestPestanasVerticales:
+    """La marca del activo va en el borde que TOCA AL PANEL, y ese borde cambia
+    con la posición de las pestañas.
+
+    **Verificado midiendo píxeles**, no deducido: con la regla vieja de
+    `border-bottom` el indicador de unas pestañas a la izquierda salía de 56x2
+    —horizontal, cruzado respecto del panel— y con las reglas por posición sale
+    de 2x40, vertical y pegado al panel.
+
+    Esa medición no vive acá: pintar y contar píxeles con la `QApplication`
+    compartida de la suite la tumbaba con un fallo de bus. Lo que queda es la
+    regla en sí, que es lo que alguien puede romper sin darse cuenta al tocar el
+    QSS — y el motivo por el que existe, escrito arriba.
+    """
+
+    def _bloque(self, selector: str) -> str:
+        from wulf_qt import Acento, Modo, hoja_de_estilo
+
+        qss = hoja_de_estilo(Acento.ORO, Modo.OSCURO)
+        assert selector in qss, f"falta la regla de {selector}"
+        return qss.split(selector)[1].split("}")[0]
+
+    def test_cada_posicion_marca_el_borde_que_toca_al_panel(self, app):
+        # Arriba el panel está debajo, así que la marca va abajo. A la izquierda
+        # el panel está a la derecha, así que va a la derecha. Etcétera.
+        esperado = {
+            "QTabBar::tab:top:selected": "border-bottom",
+            "QTabBar::tab:bottom:selected": "border-top",
+            "QTabBar::tab:left:selected": "border-right",
+            "QTabBar::tab:right:selected": "border-left",
+        }
+        for selector, borde in esperado.items():
+            assert borde in self._bloque(selector), f"{selector} debería marcar {borde}"
+
+    def test_la_regla_general_ya_no_subraya(self, app):
+        # Si volviera a llevar `border-bottom`, se sumaría al de cada posición y
+        # las pestañas verticales quedarían marcadas por dos lados.
+        from wulf_qt import Acento, Modo, hoja_de_estilo
+
+        qss = hoja_de_estilo(Acento.ORO, Modo.OSCURO)
+        general = qss.split("QTabBar::tab:selected {")[1].split("}")[0]
+        assert "border" not in general
+
+    def test_el_grosor_es_el_del_canto_seleccionado(self, app):
+        from wulf_qt import Canto
+
+        assert f"{Canto.SELECCIONADO}px" in self._bloque("QTabBar::tab:left:selected")
