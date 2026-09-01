@@ -178,3 +178,61 @@ class Atenuado(QLabel):
         super().__init__(texto, parent)
         self.setProperty("class", ATENUADO)
         self.setWordWrap(True)
+
+
+def quitar_linea_de_pestanas(pestanas: QWidget) -> QWidget:
+    """Apaga la línea que Qt pinta bajo la barra de pestañas.
+
+    **Es un color del sistema colándose en una paleta cerrada**, que es
+    exactamente el problema que esta librería existe para resolver. La barra pinta
+    bajo las pestañas una línea con el realce del escritorio —visto en una app
+    real: un `#154759` que no sale de ningún metal de Wulfenite— y **ninguna regla
+    de hoja de estilo la alcanza**: `drawBase` es una propiedad del `QTabBar`, no
+    algo que el QSS pueda tocar.
+
+    **El valor por defecto depende de cómo se arme la barra, y por eso conviene
+    forzarlo siempre.** Medido en PySide6 6.11.1 con estilo Fusion:
+
+    | | `drawBase` de fábrica |
+    |---|---|
+    | `QTabBar()` suelto | **`True`** — pinta la línea |
+    | `QTabWidget().tabBar()` | `False` |
+
+    O sea que el mismo código se ve distinto según por dónde se creó la barra, y
+    puede cambiar entre versiones de Qt. Llamar a esto siempre cuesta una línea y
+    quita la duda.
+
+    Se comprobó una por una, y todas fallan salvo la última:
+
+    | intento | resultado |
+    |---|---|
+    | sin nada | línea azul |
+    | `pane` con borde 0 | línea azul |
+    | `QTabBar` con borde 0 | línea azul |
+    | `tab-bar` sin borde | línea azul |
+    | `QTabBar` con fondo | línea azul |
+    | **`setDrawBase(False)`** | **limpia** |
+
+    No da error: solo se ve mal, y hay que saber que `setDrawBase` existe. Por eso
+    está acá y no en una nota — una regla escrita en una guía es una regla que
+    alguien se salta.
+
+    ```python
+    self.pestanas = quitar_linea_de_pestanas(QTabWidget())
+    ```
+
+    **Lo que NO hace:** decidir cómo se ven las pestañas. Tipografía, subrayado
+    del activo y estados de foco siguen siendo del acabado por defecto de Qt. Es
+    deliberado: una pieza `Pestañas` completa obliga a diseñar todo eso, y media
+    pieza sería la única del sistema que no define su acabado — peor que no
+    tenerla. Esto arregla el daño real y deja la puerta abierta.
+
+    Devuelve el mismo widget, para poder encadenarlo.
+    """
+    # Acepta las dos formas —un `QTabWidget` o un `QTabBar` suelto— porque el
+    # valor de fábrica difiere justo entre ellas, y quien llama no tendría por qué
+    # saber cuál de las dos tiene en la mano.
+    barra = pestanas.tabBar() if hasattr(pestanas, "tabBar") else pestanas
+    if hasattr(barra, "setDrawBase"):
+        barra.setDrawBase(False)
+    return pestanas

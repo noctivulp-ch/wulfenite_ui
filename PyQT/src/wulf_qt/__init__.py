@@ -31,6 +31,7 @@ Las catorce reglas, con el porqué de cada una, están en `../doc/reglas.md`.
 """
 
 from .componentes import (
+    quitar_linea_de_pestanas,
     Acciones,
     Atenuado,
     Dialogo,
@@ -84,6 +85,6 @@ __all__ = [
     "Cuadricula",
     "Dialogo", "Enlace", "EtiquetaAjustada", "Laca", "Modo", "Pozo", "Tallado",
     "SEPARACION_FOCO", "aplicar", "boton", "boton_plano", "boton_primario",
-    "barra_progreso", "canto_del_pozo", "canto_enfocado_de", "rim_de", "foco_inicial", "mostrar_aviso", "tono_enfocado",
+    "barra_progreso", "canto_del_pozo", "quitar_linea_de_pestanas", "canto_enfocado_de", "rim_de", "foco_inicial", "mostrar_aviso", "tono_enfocado",
     "color_tallado", "contraste", "hoja_de_estilo", "mezclar", "paleta",
 ]

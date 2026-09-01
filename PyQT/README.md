@@ -105,6 +105,25 @@ cuenta sería exactamente lo que le falta al paquete. Su gemelo en Flutter vive 
 el paquete Dart, y sirve para comparar los dos lados uno al lado del otro — que
 es la única forma honesta de decir si la adaptación quedó fiel.
 
+## Lo que Qt mete por su cuenta
+
+Un `QTabBar` pinta bajo las pestañas una línea con el **realce del escritorio**
+—un azul que no sale de ningún metal de Wulfenite— y **ninguna regla de QSS la
+alcanza**: `drawBase` es una propiedad del widget, no algo que la hoja de estilo
+pueda tocar. Se probaron el borde del panel, el del `QTabBar`, el de `tab-bar` y
+el fondo; ninguna sirve.
+
+```python
+self.pestanas = quitar_linea_de_pestanas(QTabWidget())
+```
+
+El valor de fábrica además **depende de cómo se arme la barra** —medido en
+PySide6 6.11.1: una `QTabBar()` suelta viene con la línea encendida y la de un
+`QTabWidget` no— así que conviene llamarlo siempre.
+
+Lo que **no** hace es decidir cómo se ven las pestañas. Eso sería una pieza
+completa, y media pieza sería la única del sistema que no define su acabado.
+
 ## Estado
 
 **0.1.0, sin publicar.** La paridad de tokens está verificada y las reglas están

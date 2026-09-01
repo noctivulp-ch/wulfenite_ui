@@ -83,6 +83,17 @@ WulfTheme(WulfAcento.ORO) {
 Cada una tiene su README con el detalle: [`flutter/`](flutter/README.md) ·
 [`PyQT/`](PyQT/README.md) · [`Kotlin/`](Kotlin/README.md).
 
+## Rendimiento
+
+El relieve pinta el mismo glifo tres veces, y eso se paga. Cuánto cuesta, dónde
+está el interruptor para apagarlo por aparato, y **cómo medirlo sin llegar a una
+conclusión falsa** —que es lo que pasó la primera vez— están en
+[`doc/rendimiento.md`](doc/rendimiento.md).
+
+El resumen de una línea: el costo está en **raster**, no en build; apagar el
+relieve baja los fotogramas lentos de 50/125 a 4/125; y envolver cada tarjeta en
+un `RepaintBoundary` **empeora**, porque la lista ya lo hace sola.
+
 ## Lo que hace que se vea así no son los colores
 
 Son las [catorce reglas](doc/reglas.md) y las pruebas que las vigilan. Los tokens
