@@ -69,3 +69,44 @@ const val WULF_FEEDBACK_TACTIL_MS = 261
  * igual en claro y en oscuro.
  */
 enum class WulfAcento { ORO, JADE, PELTRE }
+
+/**
+ * Tamaños a los que se dibuja un icono, en dp.
+ *
+ * Tres y no una escala libre: un icono a 22 junto a otro a 24 se ve descuadrado
+ * sin que nadie sepa decir por qué, y con tres nombres nadie tiene que elegir un
+ * número.
+ *
+ * **Ninguno es el objetivo táctil.** Un icono de 24 dentro de un botón sigue
+ * necesitando sus 48 alrededor — el dibujo es lo que se ve, no lo que se toca.
+ */
+object WulfIconoTamano {
+    /** En línea con un texto: junto a una etiqueta, dentro de un campo. */
+    const val CHICO = 20f
+
+    /** El de siempre. Es el tamaño de la grilla, así que no se reescala. */
+    const val NORMAL = 24f
+
+    /** Protagonista: un destino del rail, un estado vacío, un mando grande. */
+    const val GRANDE = 32f
+
+    /**
+     * En un televisor, el normal se queda corto.
+     *
+     * Es la misma razón que el labio y el canto del foco: a tres metros lo que en
+     * la mano se lee perfectamente deja de leerse.
+     */
+    const val TELEVISION = 36f
+
+    /** El tamaño que le toca a un ancho de pantalla. */
+    fun de(ancho: WulfAncho, base: Float = NORMAL): Float =
+        if (ancho.esLejano) maxOf(base, TELEVISION) else base
+}
+
+/**
+ * Aire entre un icono y el texto que lo acompaña.
+ *
+ * La mitad de la unidad: con la unidad entera el par se lee como dos cosas
+ * sueltas en vez de como una etiqueta con su icono.
+ */
+const val WULF_GAP_ICONO = 4f

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generado por iconos/a_vector_drawable.py. No editar a mano. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="1.75"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 4.5 8.5 C 3.7 9.5 3 10.7 2.5 12 C 5.5 17 8.8 19.2 12 19.2 C 13.4 19.2 14.8 18.8 16.1 18.1" />
+    <path
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="1.75"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 19.4 15.2 C 20.2 14.3 21 13.2 21.5 12 C 18.5 7 15.2 4.8 12 4.8 C 11.2 4.8 10.4 4.9 9.6 5.2" />
+    <path
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="1.75"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 4.0,4.0 L 20.0,20.0" />
+</vector>

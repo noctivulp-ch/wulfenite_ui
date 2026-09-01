@@ -43,6 +43,7 @@ export 'src/componentes/enlace.dart';
 export 'src/componentes/rail.dart';
 export 'src/componentes/falla.dart';
 export 'src/foco/foco.dart';
+export 'src/iconos/icono.dart';
 export 'src/reticula/cuadricula.dart';
 export 'src/superficies/bandeja.dart';
 export 'src/superficies/tinta.dart';

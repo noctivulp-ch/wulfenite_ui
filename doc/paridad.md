@@ -30,6 +30,7 @@ Este documento se actualiza **en el mismo commit** que añade o quita algo.
 | Onda del toque | ✓ | **por el sistema** | ✓ |
 | Pestañas | **a mano** | ✓ | **a mano** |
 | Rail de navegación | ✓ | ✓ | ✓ |
+| Iconos y su pieza | ✓ | ✓ | ✓ |
 
 ---
 
@@ -167,6 +168,25 @@ de metal y foco visible.
 y las pruebas de contraste corren en los tres.
 
 ---
+
+### Los iconos, y el formato de cada uno
+
+Los 80 SVG viven en `iconos/` y son **de la librería entera**. Lo que cambia es
+cómo llegan a cada plataforma:
+
+| | formato | de dónde |
+|---|---|---|
+| Flutter | SVG | copiados a `flutter/assets/iconos/`, dentro del paquete |
+| PyQt | SVG | leídos de `iconos/` — Qt los carga de fábrica |
+| Compose | *vector drawable* | generados a `res/drawable/wulf_*.xml` |
+
+**Android no carga SVG**, así que el juego se convierte con
+`iconos/a_vector_drawable.py`. Sale de ahí y no de Android Studio a propósito:
+importar 80 iconos a mano por la interfaz es irrepetible, y nadie lo iba a rehacer
+cuando cambiara el trazo.
+
+Los tres se regeneran del mismo sitio, así que un icono nuevo aparece en las tres
+corriendo dos guiones.
 
 ## Lo que NO viaja, y no es un hueco
 

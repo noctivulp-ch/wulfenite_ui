@@ -108,6 +108,115 @@ de aviso, no como un puntero.
 
 ---
 
+---
+
+## Usarlos en código
+
+Los tres paquetes traen la pieza `WulfIcono` / `icono()`: **no se cargan a mano**.
+La pieza resuelve el tamaño, el teñido y la accesibilidad de una vez, que son
+justo las tres cosas que cada app resolvería distinto.
+
+### Flutter
+
+Los SVG **viajan dentro del paquete**: una app que use `wulf_flutter` no tiene que
+copiarlos ni declararlos en su `pubspec`.
+
+```dart
+WulfIcono('buscar', descripcion: 'Buscar')
+WulfIcono('reportes', descripcion: 'Reportes', activo: true)
+WulfIcono('reproducir', descripcion: null, tamano: WulfIconoTamano.grande)
+```
+
+### Compose
+
+Android **no carga SVG**, así que el juego se publica además como *vector
+drawables* — los genera `iconos/a_vector_drawable.py` desde los mismos archivos.
+Los nombres pasan a `wulf_` + guion bajo, porque Android no admite guiones ni
+mayúsculas en un recurso.
+
+```kotlin
+WulfIcono(R.drawable.wulf_buscar, "Buscar")
+WulfIcono(R.drawable.wulf_reportes, "Reportes", activo = true)
+```
+
+### PyQt
+
+Qt carga SVG de fábrica.
+
+```python
+boton.setIcon(icono("buscar", laca.texto_atenuado_en_bandeja))
+boton.setIconSize(QSize(IconoTamano.NORMAL, IconoTamano.NORMAL))
+```
+
+---
+
+## Los tamaños
+
+Tres nombres y no una escala libre: un icono a 22 junto a otro a 24 se ve
+descuadrado sin que nadie sepa decir por qué.
+
+| | px | cuándo |
+|---|---|---|
+| `chico` | 20 | en línea con un texto: junto a una etiqueta, dentro de un campo |
+| `normal` | **24** | el de siempre. Es el tamaño de la grilla, así que no se reescala |
+| `grande` | 32 | protagonista: un destino del rail, un estado vacío |
+| `television` | 36 | de lejos. Se aplica **solo** cuando lo pide el tamaño de pantalla |
+
+**Ninguno es el objetivo táctil.** Un icono de 24 dentro de un botón sigue
+necesitando sus **48** alrededor: el dibujo es lo que se ve, no lo que se toca.
+Confundirlos deja botones de 24 imposibles de acertar con el dedo.
+
+En televisor la pieza crece sola donde la plataforma lo dice (Compose) y con un
+parámetro donde no lo expone (Flutter). Es la misma razón que el labio de la
+bandeja y el canto del foco: a tres metros lo que en la mano se lee perfectamente
+deja de leerse.
+
+### El aire junto al texto
+
+`wulfGapIcono` / `GAP_ICONO` = **4**, la mitad de la unidad. Con la unidad entera
+el par se lee como dos cosas sueltas en vez de como una etiqueta con su icono.
+
+---
+
+## El teñido, y el error que hay que evitar
+
+El color se aplica **respetando el alfa del dibujo**. Con el modo equivocado no
+se tiñe el trazo: se pinta **un cuadrado sólido del color** encima.
+
+| | qué usar |
+|---|---|
+| Flutter | `ColorFilter.mode(color, BlendMode.srcIn)` |
+| Compose | el `tint` de `Icon` |
+| PyQt | `QPainter` con `CompositionMode_SourceIn` |
+
+Es siempre el mismo concepto —*source in*— y en las tres pasa lo mismo si se
+usa el de por defecto. Hay una prueba en PyQt que cuenta píxeles opacos y falla
+si el resultado parece un bloque en vez de un trazo.
+
+### Qué color
+
+| estado | color |
+|---|---|
+| normal | `textoAtenuadoEnBandeja` |
+| activo / elegido | el **metal** (`primary`) |
+
+Es la misma señal que en todo el sistema: el acento marca lo elegido, y no se usa
+decorativamente. La pieza lo resuelve con `activo`; el parámetro de color a mano
+está para lo que se salga de esos dos casos, como un icono dentro de una falla.
+
+---
+
+## Accesibilidad
+
+`descripcion` es lo que oye un lector de pantalla, y **es obligatoria de pensar,
+no de rellenar**:
+
+- Un icono que **es** la acción —una lupa sola en una barra— la necesita.
+- Un icono que **acompaña** a un texto que ya dice lo mismo va con `null`. Si no,
+  se lee dos veces: *"Reportes Reportes"*.
+
+---
+
 ## El juego
 
 **Direcciones** (23) — `chevron-abajo`, `chevron-arriba`, `chevron-derecha`, `chevron-izquierda`, `flecha-abajo`, `flecha-arriba`, `flecha-derecha`, `flecha-izquierda`, `triangulo-abajo`, `triangulo-abajo-lleno`, `triangulo-arriba`, `triangulo-arriba-lleno`, `triangulo-derecha`, `triangulo-derecha-lleno`, `triangulo-izquierda`, `triangulo-izquierda-lleno`, `volver`, `avanzar`, `entrar`, `salir`, `expandir`, `contraer`, `ordenar`
