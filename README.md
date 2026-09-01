@@ -83,6 +83,17 @@ WulfTheme(WulfAcento.ORO) {
 Cada una tiene su README con el detalle: [`flutter/`](flutter/README.md) ·
 [`PyQT/`](PyQT/README.md) · [`Kotlin/`](Kotlin/README.md).
 
+## Los iconos
+
+Ochenta iconos de trazo en `iconos/`, genéricos y compartidos por los tres
+paquetes: direcciones, señales, acciones, mandos de reproductor, objetos y
+conectividad. SVG de 24x24, un solo color que se retiñe al dibujar, y sin
+dependencias para regenerarlos.
+
+Las reglas para dibujar uno nuevo sin romper la armonía —y la que más cuesta,
+que **nunca se usa `<style>`** porque Flutter lo ignora en silencio— están en
+[`doc/iconos.md`](doc/iconos.md).
+
 ## Capas, medidas y parpadeos
 
 Lo que **no falla**: no lanza excepción, no rompe una prueba, no sale en una
