@@ -7,6 +7,8 @@ que devolvería un icono vacío sin decir nada.
 
 from __future__ import annotations
 
+import pathlib
+
 import pytest
 
 from wulf_qt import GAP_ICONO, IconoTamano, disponibles, icono, pixmap
@@ -23,8 +25,21 @@ def test_el_juego_completo_esta_disponible(app):
 def test_un_nombre_que_no_existe_falla_claro(app):
     # Sin esto devolvería un icono vacío y la pantalla saldría con un hueco, sin
     # ningún error que explique por qué.
-    with pytest.raises(FileNotFoundError, match="no hay un icono"):
+    with pytest.raises(KeyError, match="no hay un icono"):
         icono("no-existe", "#000000")
+
+
+def test_los_dibujos_van_incrustados_y_no_se_leen_del_disco(app):
+    # Es lo que hace que sobreviva a Nuitka en onefile, a PyInstaller y a un
+    # wheel instalado: sin acceso al disco no hay ruta que apunte fuera del
+    # bundle. La primera versión leía de una carpeta hermana y el ejecutable
+    # reventaba al construir el primer botón.
+    from wulf_qt import iconos as modulo
+
+    fuente = pathlib.Path(modulo.__file__).read_text(encoding="utf-8")
+    assert "__file__" not in fuente, "vuelve a resolver rutas: se romperá al empaquetar"
+    assert "parents[" not in fuente
+    assert "glob(" not in fuente
 
 
 class TestElTamano:

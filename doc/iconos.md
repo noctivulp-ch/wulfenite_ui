@@ -141,11 +141,60 @@ WulfIcono(R.drawable.wulf_reportes, "Reportes", activo = true)
 
 ### PyQt
 
-Qt carga SVG de fábrica.
+Los dibujos van **incrustados en el paquete**, no se leen del disco.
 
 ```python
 boton.setIcon(icono("buscar", laca.texto_atenuado_en_bandeja))
 boton.setIconSize(QSize(IconoTamano.NORMAL, IconoTamano.NORMAL))
+```
+
+---
+
+## Cómo llega el juego a cada paquete, y por qué importa
+
+Un icono que no está **dentro** del paquete desaparece al empaquetar. Cada
+plataforma lo resuelve distinto, y las tres están cerradas:
+
+| | forma | qué lo garantiza |
+|---|---|---|
+| Flutter | los SVG copiados a `assets/iconos/` del paquete | declarados en su `pubspec`; se piden con `package: 'wulf_flutter'` |
+| Compose | *vector drawables* en `res/drawable/` | los compila AGP dentro del AAR |
+| PyQt | **incrustados como texto en un módulo** | no hay acceso al disco que romper |
+
+### El caso de Python, que es el que muerde
+
+La primera versión leía los SVG de una carpeta hermana del paquete:
+
+```python
+CARPETA = Path(__file__).resolve().parents[3] / "iconos"   # ← se rompe al empaquetar
+```
+
+Eso funciona al desarrollar y **falla en el ejecutable**: Nuitka en *onefile*,
+PyInstaller y un wheel instalado dejan esa ruta apuntando fuera del bundle. El
+programa revienta al construir el primer botón, que es el peor momento para
+enterarse.
+
+**Un enlace simbólico no lo arregla**, aunque sea lo primero que se piensa: los
+enlaces se pierden al empaquetar en zip o en wheel, no viajan bien en Windows, y
+según el empaquetador se siguen o se copian. Cambia un fallo seguro por uno
+intermitente, que es peor de encontrar.
+
+La salida es **incrustarlos**: `iconos/a_modulo_python.py` los escribe como un
+diccionario de texto en `_iconos_datos.py`. Son 36 KB —menos que una foto— y sin
+acceso al disco no hay ruta que romper.
+
+Hay una prueba que lee el propio módulo y **falla si vuelve a aparecer un
+`__file__` o un `glob`**, porque es un error fácil de reintroducir cuando alguien
+quiera "hacerlo más limpio".
+
+### Regenerar los tres
+
+```bash
+python3 iconos/generar.py            # los SVG, fuente de verdad
+python3 iconos/validar.py            # las reglas del trazo
+python3 iconos/a_vector_drawable.py  # → Compose
+python3 iconos/a_modulo_python.py    # → PyQt
+cp iconos/*.svg flutter/assets/iconos/   # → Flutter
 ```
 
 ---

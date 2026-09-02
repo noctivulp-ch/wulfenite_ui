@@ -7,19 +7,27 @@ para el activo sin mantener dos copias que acaban desincronizadas.
 Qt carga SVG de fábrica, así que no hace falta convertirlos a nada — pero sí
 **rasterizar al tamaño final**: un `QIcon` escalado desde un pixmap de otro
 tamaño sale borroso, y el trazo de 1,75 es justo donde más se nota.
+
+**Los dibujos van incrustados, no se leen del disco.** La primera versión los
+buscaba en una carpeta hermana del paquete, y eso se rompe en cuanto el programa
+se empaqueta: Nuitka en *onefile*, PyInstaller y un wheel instalado dejan esa
+ruta apuntando fuera del bundle. El fallo no aparece al desarrollar — solo en el
+ejecutable, y revienta al construir el primer botón.
+
+Un enlace simbólico tampoco servía: se pierde al empaquetar en zip o en wheel, no
+viaja bien en Windows, y según el empaquetador se sigue o se copia. Cambia un
+fallo seguro por uno intermitente, que es peor de encontrar.
+
+Incrustados no hay ruta que romper. Son 36 KB de texto, menos que una foto.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QByteArray, QSize, Qt
 from PySide6.QtGui import QColor, QIcon, QPainter, QPixmap
 from PySide6.QtSvg import QSvgRenderer
 
-#: Dónde viven los SVG. Fuera del paquete a propósito: son de la librería entera
-#: y los comparten las tres gemelas.
-CARPETA = Path(__file__).resolve().parents[3] / "iconos"
+from ._iconos_datos import ICONOS
 
 
 class IconoTamano:
@@ -51,16 +59,19 @@ class IconoTamano:
 GAP_ICONO = 4
 
 
-def ruta_de(nombre: str) -> Path:
-    """El archivo de un icono. Revienta claro si no existe."""
-    archivo = CARPETA / f"{nombre}.svg"
-    if not archivo.exists():
-        disponibles = sorted(p.stem for p in CARPETA.glob("*.svg"))
-        raise FileNotFoundError(
-            f"no hay un icono llamado {nombre!r}. Hay {len(disponibles)}, "
+def svg_de(nombre: str) -> str:
+    """El dibujo de un icono. Revienta claro si no existe.
+
+    Con un `KeyError` pelado el mensaje sería solo el nombre, y quien lo lea no
+    sabría si el icono no existe o si el paquete se instaló mal.
+    """
+    try:
+        return ICONOS[nombre]
+    except KeyError:
+        raise KeyError(
+            f"no hay un icono llamado {nombre!r}. Hay {len(ICONOS)}, "
             f"listados en doc/iconos.md"
-        )
-    return archivo
+        ) from None
 
 
 def pixmap(nombre: str, color: str, tamano: int = IconoTamano.NORMAL) -> QPixmap:
@@ -75,7 +86,7 @@ def pixmap(nombre: str, color: str, tamano: int = IconoTamano.NORMAL) -> QPixmap
 
     pintor = QPainter(lienzo)
     pintor.setRenderHint(QPainter.RenderHint.Antialiasing)
-    QSvgRenderer(str(ruta_de(nombre))).render(pintor)
+    QSvgRenderer(QByteArray(svg_de(nombre).encode("utf-8"))).render(pintor)
 
     # `SourceIn` respeta el alfa del dibujo: tiñe el trazo en vez de pintar un
     # cuadrado del color encima. Con `SourceOver` saldría un bloque sólido.
@@ -93,4 +104,4 @@ def icono(nombre: str, color: str, tamano: int = IconoTamano.NORMAL) -> QIcon:
 
 def disponibles() -> list[str]:
     """Los nombres de todos los iconos del juego."""
-    return sorted(p.stem for p in CARPETA.glob("*.svg"))
+    return sorted(ICONOS)

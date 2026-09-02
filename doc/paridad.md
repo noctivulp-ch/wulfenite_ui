@@ -177,7 +177,7 @@ cómo llegan a cada plataforma:
 | | formato | de dónde |
 |---|---|---|
 | Flutter | SVG | copiados a `flutter/assets/iconos/`, dentro del paquete |
-| PyQt | SVG | leídos de `iconos/` — Qt los carga de fábrica |
+| PyQt | SVG incrustado | como texto en `_iconos_datos.py`, sin tocar el disco |
 | Compose | *vector drawable* | generados a `res/drawable/wulf_*.xml` |
 
 **Android no carga SVG**, así que el juego se convierte con
@@ -186,7 +186,12 @@ importar 80 iconos a mano por la interfaz es irrepetible, y nadie lo iba a rehac
 cuando cambiara el trazo.
 
 Los tres se regeneran del mismo sitio, así que un icono nuevo aparece en las tres
-corriendo dos guiones.
+corriendo los guiones de `iconos/`.
+
+**Ninguno de los tres resuelve rutas en tiempo de ejecución**, y es a propósito:
+un icono que no está dentro del paquete desaparece al empaquetar. En Python eso
+llegó a estar mal —leía de una carpeta hermana, y el ejecutable de Nuitka reventaba
+al construir el primer botón— y hay una prueba que impide que vuelva.
 
 ## Lo que NO viaja, y no es un hueco
 
