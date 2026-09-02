@@ -293,16 +293,36 @@ QScrollBar::add-line, QScrollBar::sub-line {{ height: 0; width: 0; }}
 QScrollBar::add-page, QScrollBar::sub-page {{ background: transparent; }}
 
 /* ── Casillas y pestañas ─────────────────────────────────────────────────── */
+/* La FORMA distingue las dos, y no es decoración: una casilla marca varias cosas
+   y un radio elige UNA. Con la misma forma no se sabe cuál de las dos conductas
+   espera la pantalla hasta que se prueba — y probar significa marcar algo que a
+   lo mejor no se quería marcar.
+
+   Cuadrada la casilla, redondo el radio: es la convención de todos los
+   escritorios desde hace décadas y no hay nada que ganar cambiándola. */
 QCheckBox::indicator, QRadioButton::indicator {{
     width: {PADDING_CELDA}px;
     height: {PADDING_CELDA}px;
     border: 1px solid {canto};
-    border-radius: {RADIO_POZO}px;
     background: {laca.pozo};
 }}
-QCheckBox::indicator:checked, QRadioButton::indicator:checked {{
+QCheckBox::indicator {{ border-radius: {RADIO_POZO}px; }}
+QCheckBox::indicator:checked {{
     background: {metal};
     border: 1px solid {metal};
+}}
+
+/* La mitad del lado: es lo que hace un círculo, y hay que darlo en píxeles
+   porque Qt no acepta porcentajes en `border-radius`. */
+QRadioButton::indicator {{ border-radius: {PADDING_CELDA // 2}px; }}
+/* Marcado NO se rellena entero: lleva un punto dentro.
+   Un círculo lleno se confunde con una casilla redondeada a tamaño de interfaz;
+   el aro con el punto es lo que se lee como "una de estas". El degradado radial
+   es la única forma de dibujarlo desde una hoja de estilo. */
+QRadioButton::indicator:checked {{
+    border: 1px solid {metal};
+    background: qradialgradient(cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5,
+                                stop:0.45 {metal}, stop:0.5 {laca.pozo});
 }}
 QTabBar::tab {{
     background: transparent;

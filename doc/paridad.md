@@ -26,6 +26,7 @@ Este documento se actualiza **en el mismo commit** que añade o quita algo.
 | Foco inicial de pantalla | ✓ | ✓ | ✓ |
 | Barra de progreso y deslizador | ✓ | ✓ | ✓ |
 | Controles (botón, campo, interruptor) | tema | ✓ | ✓ |
+| Casillas y radios | **del sistema** | ✓ | **del sistema** |
 | Velo superior | ✓ | **no aplica** | ✓ |
 | Onda del toque | ✓ | **por el sistema** | ✓ |
 | Pestañas | **a mano** | ✓ | **a mano** |
@@ -151,6 +152,43 @@ Las tres salidas, en orden de preferencia:
 3. **Renunciar al estilo de esa barra**, si de verdad hacen falta verticales y
    legibles. Se pierde el acabado del sistema ahí, que casi siempre es peor
    negocio.
+
+### Casillas y radios — solo Qt tiene que dibujarlos
+
+Una casilla marca varias cosas; un radio elige una. La forma es lo que dice cuál
+de las dos conductas espera la pantalla, y por eso **cuadrada la casilla y
+redondo el radio** no es decoración: con la misma forma no hay manera de saberlo
+sin marcar algo que a lo mejor no se quería marcar.
+
+| | quién dibuja | qué puede romperse |
+|---|---|---|
+| Flutter | Material — `Checkbox` y `Radio` | solo el color: la forma no se puede temar |
+| Compose | Material 3 — `Checkbox` y `RadioButton` | solo el color |
+| PyQT | **la hoja de estilo**, que reemplaza el dibujo nativo | la forma **y** el color |
+
+No hay pieza propia en Flutter ni en Compose, y no es un hueco: las dos librerías
+dibujan las formas correctas y no dejan cambiarlas, así que lo único que se puede
+traer de fuera es el color — y el color ya sale del esquema de Wulfenite. Poner
+una pieza encima sería reescribir el control entero para no ganar nada.
+
+En Qt es distinto porque el QSS **sustituye** el dibujo del sistema: en cuanto la
+hoja toca `::indicator`, la forma la decide la hoja. Ahí se rompió una vez —las
+dos compartían una sola regla, con el radio de pozo, y el radio salía cuadrado—.
+Lo encontró alguien usando la librería, no las pruebas. Ahora son dos reglas:
+
+```
+QCheckBox::indicator    { border-radius: 4px; }   /* RADIO_POZO */
+QRadioButton::indicator { border-radius: 8px; }   /* la mitad del lado */
+```
+
+Y marcado, el radio **no se rellena entero**: lleva un aro con un punto dentro,
+hecho con `qradialgradient`, que es la única forma de dibujarlo desde una hoja de
+estilo. Un círculo lleno se confunde con una casilla redondeada al tamaño de la
+interfaz.
+
+Lo vigilan `PyQT/tests/test_casillas.py` —hoja y píxeles pintados—,
+`flutter/test/casillas_test.dart` y `Kotlin/.../CasillasTest.kt`, que en los dos
+últimos miran el color porque la forma no es de ellos.
 
 ### Controles — tres caminos y el mismo resultado
 
