@@ -1,0 +1,21 @@
+Wulfenite UI
+Copyright (C) 2026 NoctiVulp
+
+This program is free software: you can redistribute it and/or modify it under the terms of the
+GNU Lesser General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+SPDX-License-Identifier: LGPL-3.0-or-later
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+El nombre «NoctiVulp», el de este programa y sus logotipos no se licencian: ver TRADEMARKS.md.
+
+Componentes de terceros
+-----------------------
+
+- Flutter SDK — BSD-3-Clause
+- flutter_svg, cupertino_icons — MIT
+- PySide6 (Qt for Python) — LGPL-3.0; se instala aparte
+- AndroidX: Core, Activity, Compose UI, Material 3 — Apache-2.0
+- JUnit (solo pruebas) — EPL-2.0

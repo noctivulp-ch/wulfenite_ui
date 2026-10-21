@@ -25,7 +25,7 @@ void main() {
         home: Scaffold(
           body: WulfEnlace(
             texto: 'Hecho por NoctiVulp',
-            url: 'https://patreon.com/NoctiVulp',
+            url: 'https://www.patreon.com/cw/NoctiVulp',
             onAbrir: onAbrir ?? () async => true,
             descripcion: 'Hecho por NoctiVulp — abre la página del autor',
           ),
@@ -105,7 +105,7 @@ void main() {
     await tester.tap(find.byType(InkWell));
     await tester.pumpAndSettle();
 
-    expect(portapapeles, ['https://patreon.com/NoctiVulp']);
+    expect(portapapeles, ['https://www.patreon.com/cw/NoctiVulp']);
   });
 
   testWidgets('si se abre bien, no se copia nada', (tester) async {
