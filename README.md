@@ -24,6 +24,16 @@ El mismo sistema existe en tres librerías que comparten **los valores exactos**
 colores, el mismo espaciado, los mismos radios. Unas pruebas de paridad comparan cada port con
 la versión de Dart, incluidos los colores derivados, y fallan si alguno se separa.
 
+<p align="center">
+  <img src="doc/capturas/banco-claro-oscuro.png" width="100%" alt="Banco de estilo con acento jade, mitad en laca clara y mitad en oscura">
+</p>
+<p align="center">
+  <img src="doc/capturas/banco-oscuro-oro.png" width="49%" alt="Banco de estilo en laca oscura con oro">
+  <img src="doc/capturas/banco-claro-peltre.png" width="49%" alt="Banco de estilo en laca clara con peltre">
+</p>
+
+<p align="center"><sub>El banco de estilo del port de Qt (<code>PyQT/ejemplo/banco.py</code>). Las capturas se regeneran con <code>tools/capturas/capturas.py</code>.</sub></p>
+
 ## Paquetes
 
 | | Flutter | Qt (Python) | Kotlin |
